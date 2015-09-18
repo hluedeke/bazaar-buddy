@@ -1,0 +1,17 @@
+/*** Forms ***/
+
+button, input[type='submit'] {
+  background-color: #4d9784;
+  border-width: 0;
+  color: #fff;
+  padding: 4px 17px;
+
+  &:hover {
+    background-color: #296f5d;
+  }
+}
+
+input {
+  border: 0;
+  padding: 4px;
+}

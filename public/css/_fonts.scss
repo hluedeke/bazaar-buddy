@@ -1,0 +1,141 @@
+$serif-stack: Georgia, Helvetica, serif;
+$logo-stack: Baskerville, Georgia, Verdana;
+
+/*** Fonts ***/
+
+body {
+  font-family: Arial, Verdana, sans-serif;
+}
+
+/* General */
+
+p {
+  margin-bottom: 1em;
+}
+
+a {
+  color: #685ca0;
+}
+
+.aside {
+  font-family: arial, sans-serif;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+.text-center {
+  text-align: center;
+  width: 100%;
+}
+
+/* Headers */
+
+h1 {
+  color: #333;
+  font-size: 38px;
+  margin-bottom: 9px;
+}
+
+h2 {
+  color: #333;
+  font-size: 25px;
+  margin-bottom: 7px;
+}
+
+.head h1 {
+  color: #fff;
+  font-family: $logo-stack;
+  font-size: 40px;
+  font-weight: bold;
+  float: left;
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
+/* Menus */
+.menu a {
+  color: #296f5d;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.active {
+    color: #444;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.wizard-bar {
+  color: #ffffff;
+  font-family: $serif-stack;
+  font-size: 15px;
+
+  li {
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    &.active a {
+      font-weight: bold;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &.visited a:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Forms */
+
+button, button a, input[type='submit'] {
+  color: #fff;
+  font-family: $serif-stack;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+label {
+  display: block;
+  float: left;
+  width: 150px;
+}
+
+/* Tables */
+
+table a {
+  color: #958eb4;
+  text-decoration: underline;
+
+  &:hover {
+    color: #999;
+    text-decoration: none;
+  }
+}
+
+/* Tab bar */
+.tab-bar li {
+  a {
+    color: #333;
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &.ui-tabs-active a {
+    background-color: #ebebeb;
+  }
+}

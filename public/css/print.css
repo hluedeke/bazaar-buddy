@@ -1,0 +1,94 @@
+/* Provides styling for vendor invoices (print) */
+.invoice {
+  border: solid 1px #000000;
+  width: 8in;
+  height: 10.5in; }
+  .invoice h1 {
+    font-size: 16pt;
+    font-weight: bold;
+    font-family: Verdana, Arial, sans-serif;
+    line-height: 0.7in;
+    height: 0.7in;
+    text-align: center;
+    width: 100%; }
+  .invoice h2 {
+    font-size: 18pt;
+    font-weight: bold;
+    font-family: Verdana, Arial, sans-serif;
+    line-height: 0.45in;
+    margin-bottom: 0.2in;
+    height: 0.45in;
+    width: 100%;
+    text-align: center; }
+  .invoice table {
+    width: 7.5in;
+    border: solid 1px #000000;
+    border-collapse: collapse;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12pt;
+    margin: 0 auto 0.45in auto; }
+    .invoice table thead {
+      height: 0.62in; }
+      .invoice table thead th {
+        border: 1px solid black;
+        font-weight: bold;
+        text-align: center;
+        vertical-align: middle; }
+    .invoice table tr {
+      height: 0.45in; }
+      .invoice table tr.totals td {
+        font-weight: bold; }
+    .invoice table td {
+      border: 1px solid black;
+      font-weight: normal;
+      text-align: right;
+      padding-right: 8px; }
+  .invoice .two-col {
+    float: left;
+    width: 50%; }
+    .invoice .two-col h1 {
+      height: 0.45in;
+      line-height: 0.45in;
+      font-size: 12pt;
+      font-weight: bold;
+      text-decoration: underline; }
+  .invoice table.label-group {
+    border-width: 0;
+    width: 85%;
+    margin-right: 15%; }
+    .invoice table.label-group td {
+      border-width: 0;
+      margin-right: 0; }
+  .invoice .logo {
+    border: solid 2px #4C001A;
+    padding: 11px;
+    text-align: center;
+    width: 2.75in;
+    margin: auto; }
+    .invoice .logo img {
+      width: 1.14in;
+      height: 1.14in; }
+    .invoice .logo p {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 14pt;
+      font-weight: bold;
+      font-style: italic; }
+  .invoice .total-line {
+    height: 0.45in;
+    width: 92.5%;
+    margin-right: 7.5%;
+    clear: left; }
+    .invoice .total-line p {
+      font-size: 13pt;
+      font-family: Verdana, Arial, sans-serif;
+      font-weight: bold; }
+  .invoice .total-owed-label {
+    width: 75%;
+    float: left;
+    text-align: center; }
+  .invoice .total-owed {
+    width: 25%;
+    float: left;
+    text-align: right; }
+
+/*# sourceMappingURL=print.css.map */

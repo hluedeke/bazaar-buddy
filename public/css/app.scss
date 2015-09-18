@@ -1,0 +1,265 @@
+@import "reset";
+@import "fonts";
+@import "forms";
+
+table {
+  border-bottom: solid 1px #d2d2d2;
+  border-left: solid 1px #c2c2c2;
+  width: 100%;
+}
+
+table a:hover {
+  text-decoration: underline;
+}
+
+th, td {
+  border-right: solid 1px #c2c2c2;
+  font-size: 15px;
+  padding: 9px 11px;
+  text-align: left;
+}
+
+tr:nth-child(odd) {
+  background-color: #f4f4f4;
+}
+
+tr:nth-child(even) {
+  background-color: #fff;
+}
+
+table th {
+  background-color: #b9b9b9;
+  color: #fff;
+}
+
+table th.sub-header {
+  background-color: #dbdbdb;
+  color: #333;
+  font-style: italic;
+}
+
+table input[type="text"] {
+  border: solid 1px #aaa;
+  width: 90%;
+}
+
+table input[type="text"]:disabled {
+  background-color: transparent;
+  border-width: 0;
+}
+
+td.dynamic-row-num {
+  width: 10px;
+}
+
+td.error {
+  color: #ff0000;
+}
+
+.next {
+  float: right;
+  margin: 16px 0;
+}
+
+.cancel {
+  float: right;
+  margin: 16px 15px;
+}
+
+button.back {
+  float: right;
+  margin: 16px 0;
+}
+
+.head {
+  background-color: #685ca0;
+  color: #fff;
+  height: 80px;
+  width: 100%;
+}
+
+.menu {
+  background-color: #ddd;
+  color: #ccc;
+  padding: 8px 0;
+  width: 100%;
+  overflow: auto;
+
+  ul {
+    float: left;
+
+    li {
+      display: inline;
+      padding: 0 15px;
+    }
+  }
+}
+
+.welcome_info {
+  float: right;
+  line-height: 1.7em;
+  padding: 16px 16px 0 0;
+}
+
+.welcome_info a {
+  float: right;
+}
+
+.container {
+  margin: 45px auto 0 auto;
+  max-width: 900px;
+}
+
+.tab-bar {
+  margin-left: 25px;
+  font-family: Georgia, Helvetica, serif;
+  font-size: 15px;
+}
+
+.tab-bar li {
+  float: left;
+  margin-right: 4px;
+}
+
+.wizard-bar {
+  margin-bottom: 35px;
+  overflow: auto;
+}
+
+.wizard-bar li {
+  background-color: #958eb4;
+  display: block;
+  padding: 8px 19px;
+  float: left;
+  border-right: solid 1px #685ca0;
+}
+
+.wizard-bar li.visited {
+  background-color: #685ca0;
+}
+
+.wizard-bar li.active {
+  background-color: #403475;
+}
+
+.wizard-bar-container {
+  text-align: center;
+  width: 100%;
+}
+
+.search-box {
+  background-color: #ebebeb;
+  clear: both;
+  margin: auto;
+  padding: 20px;
+  position: relative;
+  width: 310px;
+}
+
+.search-inline {
+  position: relative;
+  float: right;
+  width: 300px;
+
+  .ui-icon-search {
+    background-color: transparent;
+    position: absolute;
+    top: 3px;
+    right: 20px;
+    padding: 0;
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+}
+
+.search-box input[type="text"], .search-inline input[type="text"] {
+  width: 270px;
+}
+
+.search-box .ui-icon-search {
+  background-color: transparent;
+  bottom: 23px;
+  padding: 0;
+  position: absolute;
+  right: 35px;
+}
+
+.tab-box, .form-box, .ui-tabs-panel {
+  background-color: #ebebeb;
+  clear: both;
+  padding: 45px;
+}
+
+.form-box {
+  margin-bottom: 25px;
+}
+
+.tab-box h1 {
+  font-size: 28px;
+  margin-bottom: 35px;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.clear {
+  clear: both;
+}
+
+.form-row {
+  margin: 8px 0;
+}
+
+.label-box {
+  float: left;
+  margin-right: 4px;
+  width: 170px;
+  text-align: right;
+}
+
+/* Overrides JQuery Autocomplete default CSS */
+.ui-tabs {
+  border: 0;
+  padding: 0;
+}
+
+.ui-menu-item {
+  background-color: #fff;
+}
+
+.ui-state-error, .ui-state-highlight {
+  line-height: 1.3em;
+  margin-bottom: 25px;
+  padding: 0.7em;
+}
+
+.ui-state-error li, .ui-state-highlight li {
+  margin: 0.5em 0 0.5em 8px;
+}
+
+.ui-icon {
+  margin: 0 0.3em;
+  float: left;
+}
+
+.ui-widget-content .ui-button {
+  border: 0;
+  background: transparent;
+}
+
+
+.ui-autocomplete {
+  background-color: #fff;
+
+  a {
+    text-decoration: none;
+  }
+}
