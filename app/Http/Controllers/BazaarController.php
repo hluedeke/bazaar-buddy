@@ -82,7 +82,8 @@ class BazaarController extends Controller
 		$bazaar->end_date   = $request->input('end_date');
 		$bazaar->save();
 
-		return view('chair.bazaar.show', $bazaar);
+
+		return view('chair.bazaar.show', compact('bazaar'));
 	}
 
 	/**
@@ -149,6 +150,7 @@ class BazaarController extends Controller
 			return redirect()->back()->withErrors($v);
 		}
 
+		$ids      = $request->input('id');
 		$names    = $request->input('name');
 		$checkout = $request->input('checkout');
 		$currency = $request->input('currency');
@@ -156,7 +158,11 @@ class BazaarController extends Controller
 			if ($vendor_num) {
 
 				try {
-					$vendor          = Vendor::whereName($names[$i])->firstOrFail();
+					if ($ids[$i])
+						$vendor = Vendor::findOrFail($ids[$i]);
+					else
+						$vendor = Vendor::whereName($names[$i])->firstOrFail();
+					$vendor->name    = $names[$i];
 					$vendor->payment = $currency[$i];
 					$vendor->save();
 				} catch (ModelNotFoundException $e) {
@@ -172,7 +178,7 @@ class BazaarController extends Controller
 						'checkout' => $checkout[$i],
 					]);
 				} catch (ModelNotFoundException $e) {
-					$vendor->bazaars()->attach($id, ['vendor_number' => $vendor_num]);
+					$vendor->bazaars()->attach($id, ['vendor_number' => $vendor_num, 'checkout' => $checkout[$i]]);
 				}
 			}
 		}
@@ -187,7 +193,7 @@ class BazaarController extends Controller
 	 */
 	public function removeVendor($id, Request $request)
 	{
-		$vendor = Vendor::whereName($request->input('input'))->first();
+		$vendor = Vendor::findOrFail($request->input('input'))->first();
 		$vendor->bazaars()->detach($id);
 	}
 

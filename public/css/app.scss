@@ -91,6 +91,7 @@ button.back {
     li {
       display: inline;
       padding: 0 15px;
+
     }
   }
 }
@@ -262,4 +263,10 @@ button.back {
   a {
     text-decoration: none;
   }
+}
+
+.ui-autocomplete-category {
+  background-color: #efefef;
+  border-bottom: solid 1px #cccccc;
+  padding: 5px 0.4em;
 }

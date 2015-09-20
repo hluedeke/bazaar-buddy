@@ -75,7 +75,7 @@
         $('#universal-search').multisearch({
             source: function (request, response) {
                 $.ajax({
-                    url: '{{ action('HelperController@acSearch') }}',
+                    url: '{{ action('SearchController@acSearch') }}',
                     data: {
                         q: request.term
                     },
@@ -88,7 +88,7 @@
                 });
             },
             select: function (event, ui) {
-                var url = "/help/doSearch?";
+                var url = "{{ action('SearchController@search') }}?";
                 for(var i in ui.item) {
                     url += i + "=" + ui.item[i] + "&";
                 }

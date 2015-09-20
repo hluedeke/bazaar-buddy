@@ -55,7 +55,7 @@ class Bazaar extends Model {
 	 */
 	public function setStartDateAttribute($date)
 	{
-		$this->attributes['start_date'] = Carbon::createFromFormat('m/d/Y', $date);
+		$this->attributes['start_date'] = Carbon::createFromFormat('m/d/Y', $date)->setTime(0,0,0);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ class Bazaar extends Model {
 	 */
 	public function setEndDateAttribute($date)
 	{
-		$this->attributes['end_date'] = Carbon::createFromFormat('m/d/Y', $date);
+		$this->attributes['end_date'] = Carbon::createFromFormat('m/d/Y', $date)->setTime(23, 59, 59);
 	}
 	
 	/**

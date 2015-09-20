@@ -64,6 +64,12 @@ Route::get('help/salesSheets', 'HelperController@acSalesSheet');
 Route::get('help/search', ['middleware' => 'auth', 'uses' => 'HelperController@acSearch']);
 Route::get('help/doSearch', ['middleware' => 'auth', 'uses' => 'HelperController@search']);
 
+// SearchController
+Route::get('search', 'SearchController@acSearch');
+Route::get('search/go', 'SearchController@search');
+Route::get('search/validation/{status}', 'SearchController@validation');
+Route::get('search/vendor/{id}', 'SearchController@vendor');
+
 //Route::get('home', 'HomeController@index');
 
 Route::controllers([

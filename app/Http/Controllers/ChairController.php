@@ -125,7 +125,7 @@ class ChairController extends Controller
 					$sale->sequence_id    = $request->input('seq_num')[$i];
 				}
 
-				if (array_search($sales_id, $request->input('valid'))) {
+				if (isset($request->input('valid')[$i])) {
 					if ($sale->validated != Validated::CORRECT)
 						$sale->validated = Validated::CH_CORRECTED;
 				}
@@ -144,7 +144,7 @@ class ChairController extends Controller
 					$sale->sequence_id    = $request->input('seq_num')[$i];
 				}
 
-				if (in_array($id, $request->input('valid')) || $sale->sales_type == SalesType::CASH) {
+				if (isset($request->input('valid')[$i]) || $sale->sales_type == SalesType::CASH) {
 					$sale->validated = Validated::CORRECT;
 				} else if ($sale->sales_type == SalesType::LAYAWAY)
 					$sale->validated = Validated::LAYAWAY;
