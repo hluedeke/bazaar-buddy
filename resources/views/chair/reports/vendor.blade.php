@@ -145,6 +145,11 @@
                     @endif
                     </tbody>
                 </table>
+
+                <a href="{{action('ReportController@daily', ['id' => $vendor->id])}}?date={{$data['daily-date']}}" target="_blank">
+                    <button style=" margin-top: 4px; float: right">Print Daily</button>
+                </a>
+                <div style="clear: both"></div>
             </div>
         @endforeach
     </div>

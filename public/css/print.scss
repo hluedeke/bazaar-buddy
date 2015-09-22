@@ -134,4 +134,14 @@ $font_stack: Verdana, Arial, sans-serif;
     float: left;
     text-align: right;
   }
+
+  .disclaimer {
+    clear: both;
+    font-family: $font_stack;
+    font-size: 11pt;
+    font-weight: bold;
+    height: 0.72in;
+    width: 7.5in;
+    margin: 0.45in auto 0 auto;
+  }
 }

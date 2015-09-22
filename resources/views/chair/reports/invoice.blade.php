@@ -27,20 +27,20 @@
         @foreach($data as $date => $row)
         <tr>
             <td>{{$date}}</td>
-            <td class="dollar-amount">{{$row['cash']}}</td>
-            <td class="dollar-amount">{{$row['credit']}}</td>
-            <td class="dollar-amount">{{$row['cc_fee']}}</td>
-            <td class="dollar-amount">{{$row['layaway']}}</td>
-            <td class="dollar-amount">{{$row['total']}}</td>
+            <td>${{$row['cash']}}</td>
+            <td>${{$row['credit']}}</td>
+            <td>${{$row['cc_fee']}}</td>
+            <td>${{$row['layaway']}}</td>
+            <td>${{$row['total']}}</td>
         </tr>
         @endforeach
         <tr class="totals">
             <td>TOTALS</td>
-            <td class="dollar-amount">{{$vendor->cash()}}</td>
-            <td class="dollar-amount">{{$vendor->credit()}}</td>
-            <td class="dollar-amount">{{$vendor->credit() * $fees['credit']}}</td>
-            <td class="dollar-amount">{{$vendor->layaway()}}</td>
-            <td class="dollar-amount">{{$vendor->totalSales()}}</td>
+            <td>${{$totals['cash']}}</td>
+            <td>${{$totals['credit']}}</td>
+            <td>${{$totals['cc_fee']}}</td>
+            <td>${{$totals['layaway']}}</td>
+            <td>${{$totals['total']}}</td>
         </tr>
         </tbody>
     </table>
@@ -51,7 +51,7 @@
             <p>
                 The Aviano Officers & Civilians Spouses'
                 Club would like to thank you for your participation
-                in the 2014 Bella Befana Bazaar! You help make
+                in the {{$bazaar->name}}! You help make
                 what we do possible!
             </p>
         </div>
@@ -63,23 +63,19 @@
             <tbody>
             <tr>
                 <td>BBB {{$fees['bazaar']}}%</td>
-                <td class="dollar-amount">{{$vendor->totalSales() * $fees['bazaar']}}</td>
+                <td>${{$totals['b_fee']}}</td>
             </tr>
             <tr>
-                <td>{{$fees['credit']}}% Credit Card Fees</td>
-                <td class="dollar-amount">{{$vendor->totalSales() * $fees['credit']}}</td>
+                <td>${{$fees['credit']}}% Credit Card Fees</td>
+                <td>${{$totals['cc_fee']}}</td>
             </tr>
-            <tr>
-                <td>On Site Table/Bench Fees</td>
-                <td class="dollar-amount">0</td>
-            </tr>
-            <tr>
+            <!--<tr>
                 <td>Audit Adjustments</td>
-                <td class="dollar-amount">0</td>
-            </tr>
+                <td>0</td>
+            </tr>-->
             <tr class="totals">
                 <td>Total BBB Deductions</td>
-                <td class="dollar-amount">0</td>
+                <td>${{$totals['deduct']}}</td>
             </tr>
             </tbody>
         </table>
@@ -91,23 +87,14 @@
             </p>
         </div>
         <div class="total-owed">
-            <p class="dollar-amount">0</p>
+            <p>${{$totals['owed']}}</p>
         </div>
     </div>
+    <div class="disclaimer">
+        Please Note: Invoice totals are subject to change after the {{$bazaar->name}} Business Office
+        conducts quality control audit. Audit will be conducted within 72 hours of the close of the bazaar.
+        Vendor will be notified via email if invoice totals are adjusted.
+    </div>
 </div>
-<script type="text/javascript">
-    $(function () {
-        $('.dollar-amount').each(function () {
-            if (this.nodeName == 'INPUT') {
-                var dollarAmount = formatDollar(this.value);
-                this.value = dollarAmount;
-            }
-            else {
-                var dollarAmount = formatDollar(this.innerHTML);
-                this.innerHTML = dollarAmount;
-            }
-        });
-    });
-</script>
 </body>
 </html>

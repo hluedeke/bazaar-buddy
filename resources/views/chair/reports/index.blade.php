@@ -44,6 +44,14 @@
                     @endforeach
                     </tbody>
                 </table>
+
+                @if(isset($tab['date']))
+                    <a href="{{action('ReportController@daily')}}?date={{$tab['date']}}">
+                        <button style=" margin-top: 4px; float: right">Print Daily</button>
+                    </a>
+                    <div style="clear: both"></div>
+                @endif
+
             </div>
             @endforeach
 

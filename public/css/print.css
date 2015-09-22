@@ -90,5 +90,13 @@
     width: 25%;
     float: left;
     text-align: right; }
+  .invoice .disclaimer {
+    clear: both;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11pt;
+    font-weight: bold;
+    height: 0.72in;
+    width: 7.5in;
+    margin: 0.45in auto 0 auto; }
 
 /*# sourceMappingURL=print.css.map */

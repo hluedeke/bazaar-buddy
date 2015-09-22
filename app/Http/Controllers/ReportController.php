@@ -53,7 +53,8 @@ class ReportController extends Controller
 		for ($date = $bazaar->start_date; $date->lte($bazaar->end_date); $date->addDay()) {
 			$data["bazaar-tab-$i"] = [
 				'title' => $date->format('F j'),
-				'data' => $this->allVendorsByDate($bazaar, $date)
+				'data' => $this->allVendorsByDate($bazaar, $date),
+				'date' => $date->format('m-d-Y'),
 			];
 			++$i;
 		}
@@ -130,6 +131,7 @@ class ReportController extends Controller
 			$id++;
 			$row['id']                     = "date-$id";
 			$row['day']                    = $date->format('l');
+			$row['daily-date']             = $date->format('m-d-Y');
 			$dates[$date->format('m/d/Y')] = $row;
 		}
 
@@ -473,7 +475,10 @@ class ReportController extends Controller
 		$bazaar = Bazaar::find($this->current_bazaar);
 		$cc_fee = AppSettings::whereName('credit_card_fee')->first();
 		$b_fee  = AppSettings::whereName('bazaar_fee')->first();
+		$cc_fee = $cc_fee->setting;
+		$b_fee  = $b_fee->setting;
 		$data   = array();
+		$totals = array();
 
 		for ($date = $bazaar->start_date; $date->lte($bazaar->end_date); $date->addDay()) {
 			$d = $date->format('j-M-Y');
@@ -493,15 +498,68 @@ class ReportController extends Controller
 				}
 			}
 
-			$data[$d]['cc_fee'] = $data[$d]['credit'] * ($b_fee->setting / 100);
+			$data[$d]['cc_fee'] = $data[$d]['credit'] * ($cc_fee / 100);
 			$data[$d]['total']  = $data[$d]['cash'] + $data[$d]['credit'] + $data[$d]['layaway'];
+
+			// Totals
+			$totals['cash']    = number_format($vendor->cash(), 2);
+			$totals['credit']  = number_format($vendor->credit(), 2);
+			$totals['layaway'] = number_format($vendor->layaway(), 2);
+			$totals['total']   = number_format($vendor->totalSales(), 2);
+			$totals['cc_fee']  = number_format($vendor->credit() * ($cc_fee / 100), 2);
+			$totals['b_fee']   = number_format($vendor->totalSales() * ($b_fee / 100), 2);
+			$totals['deduct']  = number_format($totals['cc_fee'] + $totals['b_fee'], 2);
+			$totals['owed']    = number_format($vendor->totalSales() - $totals['deduct'], 2);
+
+			// Format for pretty print
+			$data[$d]['cash']    = number_format($data[$d]['cash'], 2);
+			$data[$d]['credit']  = number_format($data[$d]['credit'], 2);
+			$data[$d]['layaway'] = number_format($data[$d]['layaway'], 2);
+			$data[$d]['cc_fee']  = number_format($data[$d]['cc_fee'], 2);
+			$data[$d]['total']   = number_format($data[$d]['total'], 2);
 		}
 
 		$fees = array(
-			'bazaar' => $b_fee->setting,
-			'credit' => $cc_fee->setting
+			'bazaar' => $b_fee,
+			'credit' => $cc_fee
 		);
 
-		return view('chair.reports.invoice', compact('vendor', 'bazaar', 'fees', 'data'));
+		return view('chair.reports.invoice', compact('vendor', 'bazaar', 'fees', 'data', 'totals'));
+	}
+
+	public function daily(Request $request, $id = null)
+	{
+		$date   = Carbon::createFromFormat('m-d-Y', $request->input('date'));
+		$bazaar = Bazaar::find($this->current_bazaar);
+		$totals = array();
+
+		if ($id !== null) {
+			$vendors = array(CurrentVendor::find($id));
+		} else {
+			$vendors = CurrentVendor::all();
+		}
+		foreach ($vendors as $vendor) {
+			$totals[$vendor->id] = array(
+				'cash' => 0,
+				'credit' => 0,
+				'layaway' => 0,
+				'total' => 0,
+			);
+
+			foreach ($vendor->salesSheets() as $sheet) {
+				if ($sheet->date_of_sales->isSameDay($date)) {
+					$totals[$vendor->id]['cash'] += $sheet->cash();
+					$totals[$vendor->id]['credit'] += $sheet->credit();
+					$totals[$vendor->id]['layaway'] += $sheet->layaway();
+					$totals[$vendor->id]['total'] += $sheet->totalSales();
+				}
+			}
+
+			$totals[$vendor->id]['cash']    = number_format($totals[$vendor->id]['cash'], 2);
+			$totals[$vendor->id]['credit']  = number_format($totals[$vendor->id]['credit'], 2);
+			$totals[$vendor->id]['layaway'] = number_format($totals[$vendor->id]['layaway'], 2);
+			$totals[$vendor->id]['total']   = number_format($totals[$vendor->id]['total'], 2);
+		}
+		return view('chair.reports.daily', compact('date', 'vendors', 'totals', 'bazaar'));
 	}
 }
