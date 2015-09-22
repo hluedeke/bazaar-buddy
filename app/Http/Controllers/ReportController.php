@@ -213,7 +213,20 @@ class ReportController extends Controller
 	 */
 	private function allVendorsRollUp($bazaar, $view = true)
 	{
+		$fee   = $this->fee * 100;
+		$ccFee = $this->creditCard * 100;
 		$data = array();
+		$totals_row = array(
+			'label' => 'TOTALS',
+			'blank' => '',
+			'Total Cash Sales'	=> 0,
+			'Total Credit Card Sales' => 0,
+			"Credit Card Fee ($ccFee%)" => 0,
+			'Total Layaway Sales' => 0,
+			'Total Sales' => 0,
+			"BBB Fee ($fee%)" => 0,
+			'currency' => ''
+		);
 
 		foreach ($bazaar->vendors as $i => $vendor) {
 			$totals = array(
@@ -242,13 +255,20 @@ class ReportController extends Controller
 				}
 			}
 
-			$fee   = $this->fee * 100;
-			$ccFee = $this->creditCard * 100;
 			if ($view) {
 				// Calculate totals, fees
 				$grandTotal = $totals[SalesType::CASH] + $totals[SalesType::CARD] + $totals[SalesType::LAYAWAY];
 				$feeData    = round($this->fee * $grandTotal, 2);
 				$ccFeeData  = round($totals[SalesType::CARD] * $this->creditCard, 2);
+
+				// Add to our "totals" row
+				$totals_row['Total Cash Sales'] += $totals[SalesType::CASH];
+				$totals_row['Total Credit Card Sales'] += $totals[SalesType::CARD];
+				$totals_row["Credit Card Fee ($ccFee%)"] += $ccFeeData;
+				$totals_row['Total Layaway Sales'] += $totals[SalesType::LAYAWAY];
+				$totals_row['Total Sales'] += $grandTotal;
+				$totals_row["BBB Fee ($fee%)"] += $feeData;
+
 			} else {
 				$j = $i + 2;
 				// Calculate totals, fees
@@ -269,8 +289,12 @@ class ReportController extends Controller
 				"BBB Fee ($fee%)" => $feeData,
 				'Payment Currency' => $vendor->payment,
 			);
+
 			$data[] = $row;
 		}
+
+		if($view)
+			$data['totals'] = $totals_row;
 
 		return $data;
 	}

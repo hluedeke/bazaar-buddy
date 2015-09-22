@@ -80,6 +80,11 @@
                         </tr>
                     @endforeach
                     </tbody>
+                    <tr>
+                        @foreach($rollup[0] as $title=>$data)
+                            <th>{{$title}}</th>
+                        @endforeach
+                    </tr>
                 </table>
             </div>
     </div>
@@ -100,7 +105,7 @@
 
 @section('scripts')
     <script type="text/javascript">
-        $(function (ready) {
+        $(function () {
 
             $('#bazaar-tabs').tabs();
 

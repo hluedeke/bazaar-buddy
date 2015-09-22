@@ -56,6 +56,12 @@ td.error {
   color: #ff0000;
 }
 
+.fixed-header {
+  position: fixed;
+  top: 0;
+
+}
+
 .next {
   float: right;
   margin: 16px 0;
