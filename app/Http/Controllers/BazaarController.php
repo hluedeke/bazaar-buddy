@@ -138,13 +138,16 @@ class BazaarController extends Controller
 			'currency' => 'array',
 			'number' => 'array',
 		], [
-			'required' => 'Something is missing for one of the vendors. Make sure you have all data for each vendor.'
+			'required' => 'Something is missing for one of the vendors. Make sure you have all data for each vendor.',
+			'dollar_format' => 'All table fee and audit amounts must be in dollars.'
 		]);
 
 		$v->each('name', ['required']);
 		$v->each('checkout', ['required', 'integer']);
 		$v->each('currency', ['required', 'in:EUR,USD,GBP']);
 		$v->each('number', ['required', 'integer']);
+		$v->each('table_fee', ['dollar_format']);
+		$v->each('audit_adjust', ['dollar_format']);
 
 		if ($v->fails()) {
 			return redirect()->back()->withErrors($v);
@@ -154,6 +157,21 @@ class BazaarController extends Controller
 		$names    = $request->input('name');
 		$checkout = $request->input('checkout');
 		$currency = $request->input('currency');
+
+		// Parse our dollar formats for table fees/audit adjustments
+		$table_fees = array();
+		foreach($request->input('table_fee') as $fee) {
+			if ($fee != '')
+				$table_fees[] = (float)preg_replace("/([^0-9\\.-])/i", "", $fee);
+		}
+
+		$audit_adjusts = array();
+		foreach($request->input('audit_adjust') as $fee) {
+		if ($fee != '')
+			$audit_adjusts[] = (float)preg_replace("/([^0-9\\.-])/i", "", $fee);
+		}
+
+
 		foreach ($request->input('number') as $i => $vendor_num) {
 			if ($vendor_num) {
 
@@ -176,9 +194,16 @@ class BazaarController extends Controller
 					$vendor->bazaars()->updateExistingPivot($id, [
 						'vendor_number' => $vendor_num,
 						'checkout' => $checkout[$i],
+						'table_fee' => $table_fees[$i],
+						'audit_adjust' => $audit_adjusts[$i],
 					]);
 				} catch (ModelNotFoundException $e) {
-					$vendor->bazaars()->attach($id, ['vendor_number' => $vendor_num, 'checkout' => $checkout[$i]]);
+					$vendor->bazaars()->attach($id, [
+						'vendor_number' => $vendor_num,
+						'checkout' => $checkout[$i],
+						'table_fee' => $table_fees[$i],
+						'audit_adjust' => $audit_adjusts[$i],
+					]);
 				}
 			}
 		}

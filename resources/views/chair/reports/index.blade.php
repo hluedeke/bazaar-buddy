@@ -33,15 +33,31 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($tab['data'] as $row)
-                        <tr>
-                            <td>{{ $row['Vendor Number'] }}</td>
-                            <td class="dollar-amount">{{ $row['Cash'] }}</td>
-                            <td class="dollar-amount">{{ $row['Credit Card'] }}</td>
-                            <td class="dollar-amount">{{ $row['Layaway'] }}</td>
-                            <td class="dollar-amount">{{ $row['Total'] }}</td>
-                        </tr>
+                    @foreach($tab['data'] as $i => $row)
+                        @if($i !== 'totals')
+                            <tr>
+                                <td>{{ $row['Vendor Number'] }}</td>
+                                <td class="dollar-amount">{{ $row[SalesType::CASH] }}</td>
+                                <td class="dollar-amount">{{ $row[SalesType::CARD] }}</td>
+                                <td class="dollar-amount">{{ $row[SalesType::LAYAWAY] }}</td>
+                                <td class="dollar-amount">{{ $row['Total'] }}</td>
+                            </tr>
+                        @endif
                     @endforeach
+                    <tr>
+                        <th>TOTALS</th>
+                        <th>Cash</th>
+                        <th>Credit Card</th>
+                        <th>Layaway</th>
+                        <th>Total</th>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::CASH] }}</td>
+                        <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::CARD] }}</td>
+                        <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::LAYAWAY] }}</td>
+                        <td class="dollar-amount">{{ $tab['data']['totals']['Total'] }}</td>
+                    </tr>
                     </tbody>
                 </table>
 
@@ -68,7 +84,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($rollup as $row)
+                    @foreach($rollup as $i => $row)
                         <tr>
                             @foreach($row as $title => $data)
                                 @if(in_array($title, $rollupCols))

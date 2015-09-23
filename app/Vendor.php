@@ -42,6 +42,18 @@ class Vendor extends Model
 			->first()->checkout;
 	}
 
+	public function tableFee($bazaar)
+	{
+		return $bazaar->vendors()->newPivotStatementForId($this->id)
+			->first()->table_fee;
+	}
+
+	public function auditAdjust($bazaar)
+	{
+		return $bazaar->vendors()->newPivotStatementForId($this->id)
+			->first()->audit_adjust;
+	}
+
 	/**
 	 * Returns whether all of the associated sales sheets for this vendor have
 	 * been completely validated or not

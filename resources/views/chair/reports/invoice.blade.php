@@ -69,10 +69,14 @@
                 <td>${{$fees['credit']}}% Credit Card Fees</td>
                 <td>${{$totals['cc_fee']}}</td>
             </tr>
-            <!--<tr>
+            <tr>
+                <td>Table Fee</td>
+                <td>${{ $totals['table_fee'] }}</td>
+            </tr>
+            <tr>
                 <td>Audit Adjustments</td>
-                <td>0</td>
-            </tr>-->
+                <td>${{ $totals['audit_adjust'] }}</td>
+            </tr>
             <tr class="totals">
                 <td>Total BBB Deductions</td>
                 <td>${{$totals['deduct']}}</td>

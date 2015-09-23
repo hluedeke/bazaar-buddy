@@ -142,27 +142,33 @@ class ReportController extends Controller
 		return view('chair.reports.vendor', compact('vendor', 'dates', 'warning'));
 	}
 
+
 	/**
 	 * Returns an Excel spreadsheet with vendor sales totals, one vendor per line
 	 * or a page to the view the vendor sales totals.
 	 *
 	 * @param $bazaar
 	 * @param $date
-	 * @param $view
-	 * @return void
-	 * @author Hannah
+	 * @param bool|true $view
+	 * @return array
 	 */
 	private function allVendorsByDate($bazaar, $date, $view = true)
 	{
 		// Sheet data
-		$data = array();
+		$data   = array();
+		$totals = array(
+			SalesType::CASH => 0,
+			SalesType::CARD => 0,
+			SalesType::LAYAWAY => 0,
+			'Total' => 0,
+		);
 
 		// Create data for spreadsheet
 		foreach ($bazaar->vendors as $i => $vendor) {
 
 			$row = array();
 
-			$row['Vendor Number']    = $vendor->vendorNumber($bazaar);
+			$row['Vendor Number']    = $vendor->vendorNumber($bazaar) . " - " . $vendor->name;
 			$row[SalesType::CASH]    = 0;
 			$row[SalesType::CARD]    = 0;
 			$row[SalesType::LAYAWAY] = 0;
@@ -175,12 +181,15 @@ class ReportController extends Controller
 						switch ($sale->sales_type) {
 							case SalesType::CASH:
 								$row[SalesType::CASH] += $sale->amount;
+								$totals[SalesType::CASH] += $sale->amount;
 								break;
 							case SalesType::CARD:
 								$row[SalesType::CARD] += $sale->amount;
+								$totals[SalesType::CARD] += $sale->amount;
 								break;
 							case SalesType::LAYAWAY:
 								$row[SalesType::LAYAWAY] += $sale->amount;
+								$totals[SalesType::LAYAWAY] += $sale->amount;
 								break;
 						}
 					}
@@ -193,6 +202,7 @@ class ReportController extends Controller
 					$row[SalesType::CASH] +
 					$row[SalesType::CARD] +
 					$row[SalesType::LAYAWAY];
+				$totals['Total'] += $row['Total'];
 			} else {
 				$j            = $i + 2;
 				$row['Total'] = "=SUM(\$B$j:\$D$j)";
@@ -200,6 +210,7 @@ class ReportController extends Controller
 			$data[] = $row;
 		}
 
+		$data['totals'] = $totals;
 		return $data;
 	}
 
@@ -213,13 +224,13 @@ class ReportController extends Controller
 	 */
 	private function allVendorsRollUp($bazaar, $view = true)
 	{
-		$fee   = $this->fee * 100;
-		$ccFee = $this->creditCard * 100;
-		$data = array();
+		$fee        = $this->fee * 100;
+		$ccFee      = $this->creditCard * 100;
+		$data       = array();
 		$totals_row = array(
 			'label' => 'TOTALS',
 			'blank' => '',
-			'Total Cash Sales'	=> 0,
+			'Total Cash Sales' => 0,
 			'Total Credit Card Sales' => 0,
 			"Credit Card Fee ($ccFee%)" => 0,
 			'Total Layaway Sales' => 0,
@@ -278,7 +289,7 @@ class ReportController extends Controller
 			}
 
 			// Store data
-			$row    = array(
+			$row = array(
 				'Vendor Number' => $vendor->vendorNumber($bazaar),
 				'Vendor Name' => $vendor->name,
 				'Total Cash Sales' => $totals[SalesType::CASH],
@@ -293,7 +304,7 @@ class ReportController extends Controller
 			$data[] = $row;
 		}
 
-		if($view)
+		if ($view)
 			$data['totals'] = $totals_row;
 
 		return $data;
@@ -532,8 +543,10 @@ class ReportController extends Controller
 			$totals['total']   = number_format($vendor->totalSales(), 2);
 			$totals['cc_fee']  = number_format($vendor->credit() * ($cc_fee / 100), 2);
 			$totals['b_fee']   = number_format($vendor->totalSales() * ($b_fee / 100), 2);
-			$totals['deduct']  = number_format($totals['cc_fee'] + $totals['b_fee'], 2);
+			$totals['deduct']  = number_format($totals['cc_fee'] + $totals['b_fee'] + $vendor->table_fee + $vendor->audit_adjust, 2);
 			$totals['owed']    = number_format($vendor->totalSales() - $totals['deduct'], 2);
+			$totals['table_fee']    = number_format($vendor->table_fee, 2);
+			$totals['audit_adjust']    = number_format($vendor->audit_adjust, 2);
 
 			// Format for pretty print
 			$data[$d]['cash']    = number_format($data[$d]['cash'], 2);
@@ -583,6 +596,10 @@ class ReportController extends Controller
 			$totals[$vendor->id]['credit']  = number_format($totals[$vendor->id]['credit'], 2);
 			$totals[$vendor->id]['layaway'] = number_format($totals[$vendor->id]['layaway'], 2);
 			$totals[$vendor->id]['total']   = number_format($totals[$vendor->id]['total'], 2);
+
+			if($date->isSameDay($bazaar->start_date) && $vendor->table_fee != 0) {
+				$totals[$vendor->id]['table_fee'] = number_format($vendor->table_fee, 2);
+			}
 		}
 		return view('chair.reports.daily', compact('date', 'vendors', 'totals', 'bazaar'));
 	}
