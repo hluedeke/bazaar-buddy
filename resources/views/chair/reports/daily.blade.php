@@ -46,6 +46,20 @@
             </tr>
             </tbody>
         </table>
+        @if(isset($totals[$vendor->id]['table_fee']))
+            <div class="two-col">
+                <h1>FEES/DEDUCTIONS</h1>
+
+                <table class="label-group" border="0">
+                    <tbody>
+                    <tr>
+                        <td>Table Fee</td>
+                        <td>${{$totals[$vendor->id]['table_fee']}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 @endforeach
 </body>

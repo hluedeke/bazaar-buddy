@@ -50,6 +50,8 @@
                     </select>
                 </td>
                 <td class="dynamic-row-trigger"><input type="text" name="checkout[]"/></td>
+                <td><input type="text" class="dollar-amount" name="table_fee[]"/></td>
+                <td><input type="text" class="dollar-amount" name="audit_adjust[]"/></td>
                 <td></td>
                 <td><a class="vendor-del" href="#">
                         <span class="ui-icon ui-icon-circle-close"></span>
@@ -65,6 +67,8 @@
                 <th>Name</th>
                 <th>Currency</th>
                 <th>Checkout Order</th>
+                <th>Table Fees</th>
+                <th>Audit Adjustment</th>
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>
@@ -76,6 +80,8 @@
                     <td class="vendor-name">{{ $vendor->name }}</td>
                     <td class="payment">{{ $vendor->payment }}</td>
                     <td class="checkout-number">{{$vendor->checkout($bazaar)}}</td>
+                    <td class="table dollar-amount">{{$vendor->tableFee($bazaar)}}</td>
+                    <td class="audit dollar-amount">{{$vendor->auditAdjust($bazaar)}}</td>
                     <td><a class="vendor-edit" href="#">
                             <span class="ui-icon ui-icon-pencil"></span>
                         </a></td>
@@ -85,7 +91,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td id="empty" colspan="5">This bazaar doesn't have any vendors yet.</td>
+                    <td id="empty" colspan="6">This bazaar doesn't have any vendors yet.</td>
                 </tr>
             @endforelse
 
@@ -99,7 +105,7 @@
     </div>
     <input type="submit" class="next" value="Save"/>
     {!! Form::close() !!}
-    <a id="cancel-btn" href="{{ action('BazaarController@index')}}">
+    <a id="cancel-btn" href="{{ Request::url() }}">
         <button class="cancel">Cancel</button>
     </a>
 
@@ -137,7 +143,8 @@
                 newRow.find('select[name="currency\[\]"]').val(oldRow.find('.payment').text());
                 newRow.find('input[name="checkout\[\]"]').val(oldRow.find('.checkout-number').text());
                 newRow.find('input[name="id\[\]"]').val(oldRow.find('.vendor-id').text());
-
+                newRow.find('input[name="table_fee\[\]"]').val(oldRow.find('.table').text());
+                newRow.find('input[name="audit_adjust\[\]"]').val(oldRow.find('.audit').text());
             });
 
             $('table').on("click", '.vendor-del', function () {
@@ -190,6 +197,11 @@
                 vendorAC($(element).find('.vendor-name'));
             });
 
+            // Run our dollar-formatting algorithm on dollar-related input fields
+            $(document).on("blur", ".dollar-amount", function(event) {
+                var dollarAmount = formatDollar(this.value);
+                this.value = dollarAmount;
+            });
         });
     </script>
 @stop
