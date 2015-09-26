@@ -81,6 +81,7 @@
                         @foreach($rollup[0] as $title=>$data)
                             <th>{{$title}}</th>
                         @endforeach
+                        <th>Checkout</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -93,6 +94,19 @@
                                     <td>{{ $data }}</td>
                                 @endif
                             @endforeach
+                            @if($row['Vendor Number'] != 'TOTALS')
+                            <td>
+                                @if(in_array($row['Vendor Number'], $checked_out))
+                                    <input class="checked-out" type="checkbox" name="checked-out"
+                                           value="{{$row['Vendor Number']}}" checked/>
+                                @else
+                                    <input class="checked-out" type="checkbox" name="checked-out"
+                                           value="{{$row['Vendor Number']}}"/>
+                                @endif
+                            </td>
+                                @else
+                                <td></td>
+                                @endif
                         </tr>
                     @endforeach
                     </tbody>
@@ -100,6 +114,7 @@
                         @foreach($rollup[0] as $title=>$data)
                             <th>{{$title}}</th>
                         @endforeach
+                        <th>Checkout</th>
                     </tr>
                 </table>
             </div>
@@ -138,6 +153,20 @@
                 delay: 120
             });
 
+            $('.checked-out').click(function () {
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '{{action('ReportController@checkout')}}',
+                    data: {
+                        id: $(this).val(),
+                        checked: this.checked
+                    },
+                    error: function (jqXHR, status) {
+                        $(self).prop('checked', false);
+                    }
+                });
+            });
         });
     </script>
 @stop

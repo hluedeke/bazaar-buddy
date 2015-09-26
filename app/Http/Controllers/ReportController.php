@@ -9,6 +9,7 @@ use App\SalesType;
 use App\CurrentVendor;
 
 
+use App\Vendor;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -73,6 +74,14 @@ class ReportController extends Controller
 			"BBB Fee ($fee%)",
 		];
 
+		// Checked out column
+		$checked_out = array();
+		foreach($bazaar->vendors as $vendor) {
+			if($vendor->pivot->checked_out) {
+				$checked_out[] = $vendor->pivot->vendor_number;
+			}
+		}
+
 		if (!$bazaar->isValidated()) {
 			$warning = "WARNING: This bazaar still has non-validated or incorrect sales sheets. This total may not be accurate.";
 		}
@@ -82,12 +91,34 @@ class ReportController extends Controller
 			'data' => $data,
 			'rollup' => $rollup,
 			'rollupCols' => $rollupCols,
+			'checked_out' => $checked_out,
 		);
 
 		if (isset($warning))
 			$params['warning'] = $warning;
 
 		return view('chair.reports.index', $params);
+	}
+
+	/**
+	 * @param Request $request
+	 * @return int
+	 */
+	public function checkout(Request $request)
+	{
+		$id      = $request->get('id');
+		$checked = $request->get('checked') === 'true' ? true : false;
+
+		$v      = Vendor::join('bazaar_vendor', 'bazaar_vendor.vendor_id', '=', 'vendors.id')
+			->select('vendors.id')
+			->where('bazaar_vendor.bazaar_id', '=', $this->current_bazaar)
+			->where('bazaar_vendor.vendor_number', '=', $id)->first();
+		$vendor = Vendor::find($v->id);
+		$vendor->bazaars()->updateExistingPivot($this->current_bazaar, [
+			'checked_out' => $checked
+		]);
+
+		return 1;
 	}
 
 	/**
@@ -227,16 +258,17 @@ class ReportController extends Controller
 		$fee        = $this->fee * 100;
 		$ccFee      = $this->creditCard * 100;
 		$data       = array();
+		$checkedout = array();
 		$totals_row = array(
-			'label' => 'TOTALS',
-			'blank' => '',
+			'Vendor Number' => 'TOTALS',
+			'Vendor Name' => '',
 			'Total Cash Sales' => 0,
 			'Total Credit Card Sales' => 0,
 			"Credit Card Fee ($ccFee%)" => 0,
 			'Total Layaway Sales' => 0,
 			'Total Sales' => 0,
 			"BBB Fee ($fee%)" => 0,
-			'currency' => ''
+			'Payment Currency' => ''
 		);
 
 		foreach ($bazaar->vendors as $i => $vendor) {
@@ -537,16 +569,16 @@ class ReportController extends Controller
 			$data[$d]['total']  = $data[$d]['cash'] + $data[$d]['credit'] + $data[$d]['layaway'];
 
 			// Totals
-			$totals['cash']    = number_format($vendor->cash(), 2);
-			$totals['credit']  = number_format($vendor->credit(), 2);
-			$totals['layaway'] = number_format($vendor->layaway(), 2);
-			$totals['total']   = number_format($vendor->totalSales(), 2);
-			$totals['cc_fee']  = number_format($vendor->credit() * ($cc_fee / 100), 2);
-			$totals['b_fee']   = number_format($vendor->totalSales() * ($b_fee / 100), 2);
-			$totals['deduct']  = number_format($totals['cc_fee'] + $totals['b_fee'] + $vendor->table_fee + $vendor->audit_adjust, 2);
-			$totals['owed']    = number_format($vendor->totalSales() - $totals['deduct'], 2);
+			$totals['cash']         = number_format($vendor->cash(), 2);
+			$totals['credit']       = number_format($vendor->credit(), 2);
+			$totals['layaway']      = number_format($vendor->layaway(), 2);
+			$totals['total']        = number_format($vendor->totalSales(), 2);
+			$totals['cc_fee']       = number_format($vendor->credit() * ($cc_fee / 100), 2);
+			$totals['b_fee']        = number_format($vendor->totalSales() * ($b_fee / 100), 2);
+			$totals['deduct']       = number_format($totals['cc_fee'] + $totals['b_fee'] + $vendor->table_fee + $vendor->audit_adjust, 2);
+			$totals['owed']         = number_format($vendor->totalSales() - $totals['deduct'], 2);
 			$totals['table_fee']    = number_format($vendor->table_fee, 2);
-			$totals['audit_adjust']    = number_format($vendor->audit_adjust, 2);
+			$totals['audit_adjust'] = number_format($vendor->audit_adjust, 2);
 
 			// Format for pretty print
 			$data[$d]['cash']    = number_format($data[$d]['cash'], 2);
@@ -597,7 +629,7 @@ class ReportController extends Controller
 			$totals[$vendor->id]['layaway'] = number_format($totals[$vendor->id]['layaway'], 2);
 			$totals[$vendor->id]['total']   = number_format($totals[$vendor->id]['total'], 2);
 
-			if($date->isSameDay($bazaar->start_date) && $vendor->table_fee != 0) {
+			if ($date->isSameDay($bazaar->start_date) && $vendor->table_fee != 0) {
 				$totals[$vendor->id]['table_fee'] = number_format($vendor->table_fee, 2);
 			}
 		}

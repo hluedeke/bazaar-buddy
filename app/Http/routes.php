@@ -37,6 +37,7 @@ Route::get('chair/reports/download', 'ReportController@rollupExcel');
 Route::get('chair/reports/download/{id}', 'ReportController@vendorExcel');
 Route::get('chair/reports/invoice/{id}', 'ReportController@invoice');
 Route::get('chair/reports/daily/{id?}', 'ReportController@daily');
+Route::get('chair/reports/checkout', 'ReportController@checkout');
 
 // Validation Controller
 Route::get('salesSheet/validate/validate', 'ValidationController@validateSheet');

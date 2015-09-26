@@ -16,7 +16,10 @@ class AddFinancialsToBazaarVendor extends Migration {
 		{
 			$table->decimal('table_fee', 10, 2)->default(0);
 			$table->decimal('audit_adjust', 10, 2)->default(0);
+<<<<<<< HEAD
 			$table->boolean('checked_out');
+=======
+>>>>>>> 9923a9a6313719f4a4d78ae14970753272df55bf
 		});
 	}
 
@@ -29,7 +32,11 @@ class AddFinancialsToBazaarVendor extends Migration {
 	{
 		Schema::table('bazaar_vendor', function(Blueprint $table)
 		{
+<<<<<<< HEAD
 			$table->dropColumn(['table_fee', 'audit_adjust', 'checked_out']);
+=======
+			$table->dropColumn(['table_fee', 'audit_adjust']);
+>>>>>>> 9923a9a6313719f4a4d78ae14970753272df55bf
 		});
 	}
 

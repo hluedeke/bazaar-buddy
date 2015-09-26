@@ -38,13 +38,12 @@ class MainController extends Controller {
 		$this->validate($request, [
 			'name' => 'required'
 		]);
-		
+
 		$user = User::whereName($request->input('name'))->first();
 		if($user) {
 			// Have our chairs actually login
 			if($user->isChair())
 				return Redirect::to(action('ChairController@index'));
-
 			Auth::login($user);
 		}
 		else {

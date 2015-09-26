@@ -14,7 +14,12 @@ class Vendor extends Model
 
 	public function bazaars()
 	{
-		return $this->belongsToMany('\App\Bazaar')->withPivot('vendor_number')->withTimestamps();
+		return $this->belongsToMany('\App\Bazaar')->withPivot(
+			'vendor_number',
+			'checkout',
+			'table_fee',
+			'audit_adjust'
+		)->withTimestamps();
 	}
 
 	public function salesSheets()

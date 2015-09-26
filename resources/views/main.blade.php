@@ -51,7 +51,7 @@
             }
         });
 
-        @if(Auth::user()->isChair())
+        @if(Auth::user() && Auth::user()->isChair())
 
          $.widget("custom.multisearch", $.ui.autocomplete, {
                     _create: function () {
