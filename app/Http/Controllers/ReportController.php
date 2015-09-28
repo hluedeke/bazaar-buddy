@@ -570,6 +570,7 @@ class ReportController extends Controller
 
 			$cc_fee_total = $vendor->credit() * ($cc_fee / 100);
 			$b_fee_total = $vendor->totalSales() * ($b_fee / 100);
+			$deduct = $cc_fee_total + $b_fee_total + $vendor->table_fee + $vendor->audit_adjust;
 
 			// Totals
 			$totals['cash']         = number_format($vendor->cash(), 2);
@@ -578,8 +579,8 @@ class ReportController extends Controller
 			$totals['total']        = number_format($vendor->totalSales(), 2);
 			$totals['cc_fee']       = number_format($cc_fee_total, 2);
 			$totals['b_fee']        = number_format($b_fee_total, 2);
-			$totals['deduct']       = number_format($cc_fee_total + $b_fee_total + $vendor->table_fee + $vendor->audit_adjust, 2);
-			$totals['owed']         = number_format($vendor->totalSales() - $totals['deduct'], 2);
+			$totals['deduct']       = number_format($deduct, 2);
+			$totals['owed']         = number_format($vendor->totalSales() - $deduct, 2);
 			$totals['table_fee']    = number_format($vendor->table_fee, 2);
 			$totals['audit_adjust'] = number_format($vendor->audit_adjust, 2);
 
