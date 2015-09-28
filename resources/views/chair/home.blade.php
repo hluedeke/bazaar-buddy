@@ -11,6 +11,7 @@
 </div>
 
 <div class="form-box">
+	@include('errors._message')
 	<table id="sales-sheets" class="clear tablesorter">
 		<thead>
 			<tr>

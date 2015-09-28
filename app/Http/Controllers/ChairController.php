@@ -71,10 +71,9 @@ class ChairController extends Controller
 	}
 
 	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 * @author Hannah
+	 * @param $id
+	 * @param Request $request
+	 * @return mixed
 	 */
 	public function update($id, Request $request)
 	{
@@ -103,7 +102,6 @@ class ChairController extends Controller
 		$sheet->save();
 
 		// Remove any deleted sales
-		$not = array();
 		foreach ($sheet->sales as $sale) {
 			if (!in_array($sale->id, $request->input('sales'))) {
 				$sale->delete();
@@ -155,24 +153,23 @@ class ChairController extends Controller
 			}
 		}
 
+		//return Redirect::to(action('ChairController@review', ['id' => $id]));
 		Session::flash('message', "Sheet $id has been updated successfully.");
-		return Redirect::to(action('ChairController@review', ['id' => $id]));
+		return Redirect::to(action('ChairController@index'));
 	}
 
 	/**
-	 * Validation for updating the sheet sales
-	 *
-	 * @return void
-	 * @author Hannah
+	 * @param Request $request
+	 * @return \Illuminate\Validation\Validator
 	 */
 	private function validateSheetSales(Request $request)
 	{
-		Validator::extend('dollar_format', function ($attribute, $value, $parameters) {
+		\Validator::extend('dollar_format', function ($attribute, $value, $parameters) {
 			$test = preg_replace("/([^0-9\\.])/i", "", $value);
 			return is_numeric($test) && !is_null($test);
 		});
 
-		$v = Validator::make($request->all(), [
+		$v = \Validator::make($request->all(), [
 			'date_of_sales' => 'date|required',
 			'sheet_number' => 'numeric|required',
 			'vendor' => 'required|exists:current_vendors,name',

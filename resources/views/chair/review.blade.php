@@ -13,12 +13,6 @@
     {!! Form::open() !!}
     <div class="form-box">
 
-        @if(Session::has('message'))
-            <div class="ui-state-highlight ui-corner-all">
-                <span class="ui-icon ui-icon-check"></span><span>{{ Session::get('message') }}</span>
-            </div>
-        @endif
-
         @if(Session::has('error'))
             <div class="ui-state-error ui-corner-all">
                 <span class="ui-icon ui-icon-alert"></span><span>{{ Session::get('error') }}</span>
@@ -40,6 +34,11 @@
     </div>
 
     <div class="form-box">
+
+        <div class="aside">
+            Sales Total: <span id="sales-total"></span>
+        </div>
+
         <table id="review-sales">
             <thead>
             <tr>
@@ -104,7 +103,7 @@
                                class="left hideable"/></td>
                     <td>
                         <input name="valid[0]" type="checkbox"
-                               class="validbox" value="new" />
+                               class="validbox" value="new"/>
 
                     </td>
                     <td>{!! Form::select('sales_type[]', SalesType::values()) !!}</td>
@@ -192,10 +191,35 @@
                 disableOptFields($(this).closest("tr"));
             });
 
-            $(document).on("row-added", function(event) {
+            $(document).on("row-added", function (event) {
                 ++valid_counter;
                 var element = $('.dynamic-row:last').find('.validbox');
                 element.attr('name', element.attr('name').replace(/\d+/i, valid_counter));
+            });
+
+            // TODO - make into plugin
+            function runTotals() {
+                var total = 0;
+                $('#review-sales .dollar-amount').each(function () {
+                    var number = Number($(this).val().replace(/[^0-9\.]+/g, ""));
+                    total += number;
+                });
+
+                $('#sales-total').html(formatDollar(total, true));
+            }
+
+            runTotals();
+
+            // Run our dollar-formatting algorithm on dollar-related input fields
+            $(document).on("blur", ".dollar-amount", function (event) {
+                var dollarAmount = formatDollar(this.value);
+                this.value = dollarAmount;
+
+                runTotals();
+            });
+
+            $(document).on("row-removed", function (event) {
+                runTotals();
             });
 
         });
