@@ -33,11 +33,15 @@
         </div>
     </div>
 
-    <div class="form-box">
+    <div class="small-aside" style="margin-left: auto; margin-right: auto;">
+        Cash Total: <span class="right" id="cash-total">$0.00</span><br/>
+        Card Total: <span class="right" id="card-total">$0.00</span><br/>
+        Layaway Total: <span class="right" id="layaway-total">$0.00</span><br/>
+        <hr/>
+        Sales Total: <span class="right" id="sales-total">$0.00</span><br/>
+    </div>
 
-        <div class="aside">
-            Sales Total: <span id="sales-total"></span>
-        </div>
+    <div class="form-box">
 
         <table id="review-sales">
             <thead>
@@ -205,7 +209,32 @@
                     total += number;
                 });
 
+                var card = 0;
+                var cash = 0;
+                var layaway = 0;
+                $('select[name="sales_type\[\]"]').each(function () {
+
+                    var amount = $(this).closest('tr').find('.dollar-amount').val();
+                    amount = Number(amount.replace(/[^0-9\.]+/g, ""));
+
+                    switch ($(this).val()) {
+                        case '{{SalesType::CARD}}':
+                            card += amount;
+                            break;
+                        case '{{SalesType::CASH}}':
+                            cash += amount;
+                            break;
+                        case '{{SalesType::LAYAWAY}}':
+                            layaway += amount;
+                            break;
+                    }
+                });
+
+                $('#cash-total').html(formatDollar(cash, true));
+                $('#card-total').html(formatDollar(card, true));
+                $('#layaway-total').html(formatDollar(layaway, true));
                 $('#sales-total').html(formatDollar(total, true));
+
             }
 
             runTotals();

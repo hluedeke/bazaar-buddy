@@ -61,6 +61,11 @@ a {
   font-weight: bold;
   margin: 8px 0; }
 
+.small-aside {
+  font-family: arial, sans-serif;
+  line-height: 1.2em;
+  margin: 8px 0; }
+
 .text-center {
   text-align: center;
   width: 100%; }
@@ -333,6 +338,10 @@ button.back {
   margin-right: 4px;
   width: 170px;
   text-align: right; }
+
+.small-aside {
+  margin-bottom: 25px;
+  width: 200px; }
 
 /* Overrides JQuery Autocomplete default CSS */
 .ui-tabs {
