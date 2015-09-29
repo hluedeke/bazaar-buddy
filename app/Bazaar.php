@@ -17,6 +17,10 @@ class Bazaar extends Model {
 		return $this->belongsToMany('\App\Vendor')->withPivot('vendor_number', 'checked_out')->orderBy('vendor_number');
 	}
 
+	public function vendorsByCheckout() {
+		return $this->belongsToMany('\App\Vendor')->withPivot('vendor_number', 'checked_out')->orderBy('checkout');
+	}
+
 	
 	public function salesSheets() {
 		return $this->hasMany('\App\SalesSheet');

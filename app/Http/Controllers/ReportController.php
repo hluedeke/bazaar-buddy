@@ -46,7 +46,7 @@ class ReportController extends Controller
 	 */
 	public function index()
 	{
-		$bazaar = Bazaar::find($this->current_bazaar);
+		$bazaar = Bazaar::whereId($this->current_bazaar)->with('vendorsByCheckout')->first();
 		$data   = array();
 
 		// Bazaar totals by day
@@ -188,6 +188,7 @@ class ReportController extends Controller
 		// Sheet data
 		$data   = array();
 		$totals = array(
+			'Vendor Number' => '',
 			SalesType::CASH => 0,
 			SalesType::CARD => 0,
 			SalesType::LAYAWAY => 0,
@@ -271,7 +272,7 @@ class ReportController extends Controller
 			'Payment Currency' => ''
 		);
 
-		foreach ($bazaar->vendors as $i => $vendor) {
+		foreach ($bazaar->vendorsByCheckout as $i => $vendor) {
 			$totals = array(
 				SalesType::CASH => 0,
 				SalesType::CARD => 0,
@@ -315,9 +316,9 @@ class ReportController extends Controller
 			} else {
 				$j = $i + 2;
 				// Calculate totals, fees
-				$grandTotal = "=SUM(\$C$j,\$D$j,\$F$j)";
-				$feeData    = "=\$G$j*" . $this->fee;
-				$ccFeeData  = "=\$D$j*" . $this->creditCard;
+				$grandTotal = "=SUM(\$D$j,\$E$j,\$G$j)";
+				$feeData    = "=\$H$j*" . $this->fee;
+				$ccFeeData  = "=\$E$j*" . $this->creditCard;
 			}
 
 			// Store data
