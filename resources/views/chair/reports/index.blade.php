@@ -94,7 +94,7 @@
                                     <td>{{ $data }}</td>
                                 @endif
                             @endforeach
-                            @if($row['Vendor Number'] != 'TOTALS')
+                            @if($row['Checkout Order'] != 'TOTALS')
                             <td>
                                 @if(in_array($row['Vendor Number'], $checked_out))
                                     <input class="checked-out" type="checkbox" name="checked-out"

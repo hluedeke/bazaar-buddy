@@ -99,9 +99,11 @@ class SalesSheetController extends Controller
 		if ($request->exists('vendor')) {
 			$vendor = $request->input('vendor');
 			if ($vendor != '') {
-				$vendor = explode('-', $vendor);
-				if (count($vendor) >= 2) {
-					$request->merge(['vendor_number' => trim($vendor[0])]);
+				$vendorArr = explode('-', $vendor);
+				if (count($vendorArr) >= 2) {
+					$request->merge(['vendor_number' => trim($vendorArr[0])]);
+				} else if(is_numeric($vendor)) {
+					$request->merge(['vendor_number' => $vendor]);
 				} else {
 					$vendor = CurrentVendor::where('name', '=', $vendor)->firstOrFail();
 					$request->merge(['vendor_number' => $vendor->vendor_number]);
@@ -288,7 +290,10 @@ class SalesSheetController extends Controller
 	public function storeSalesSheet()
 	{
 		$sheet = Session::get('sheet');
-		$sales = Session::get('sheet_sales');
+		$sales = array();
+		if(Session::has('sheet_sales')) {
+			$sales = Session::get('sheet_sales');
+		}
 
 		// If there are no credit card sales, we need to skip the validation step
 		$needsValidation = false;
@@ -368,7 +373,7 @@ class SalesSheetController extends Controller
 	 * @return void
 	 * @author Hannah
 	 */
-	private function validateSheetSales(Request $request)
+	private function  validateSheetSales(Request $request)
 	{
 		$v = Validator::make($request->all(), [
 			'cash_amount' => 'array',

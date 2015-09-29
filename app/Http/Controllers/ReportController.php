@@ -258,9 +258,9 @@ class ReportController extends Controller
 		$fee        = $this->fee * 100;
 		$ccFee      = $this->creditCard * 100;
 		$data       = array();
-		$checkedout = array();
 		$totals_row = array(
-			'Vendor Number' => 'TOTALS',
+			'Checkout Order' => 'TOTALS',
+			'Vendor Number' => '',
 			'Vendor Name' => '',
 			'Total Cash Sales' => 0,
 			'Total Credit Card Sales' => 0,
@@ -322,6 +322,7 @@ class ReportController extends Controller
 
 			// Store data
 			$row = array(
+				'Checkout Order' => $vendor->checkout($bazaar),
 				'Vendor Number' => $vendor->vendorNumber($bazaar),
 				'Vendor Name' => $vendor->name,
 				'Total Cash Sales' => $totals[SalesType::CASH],

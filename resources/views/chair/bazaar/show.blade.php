@@ -105,7 +105,7 @@
     </div>
     <input type="submit" class="next" value="Save"/>
     {!! Form::close() !!}
-    <a id="cancel-btn" href="{{ Request::url() }}">
+    <a id="cancel-btn" href="{{ action('BazaarController@index') }}">
         <button class="cancel">Cancel</button>
     </a>
 

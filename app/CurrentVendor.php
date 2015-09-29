@@ -34,7 +34,7 @@ class CurrentVendor extends Model {
 			$vendor = CurrentVendor::whereVendorNumber(trim($pieces[0]))->firstOrFail();
 		}
 		else if(is_numeric($pieces))
-			$vendor = CurrentVendor::whereVendorNumber($vpieces)->firstOrFail();
+			$vendor = CurrentVendor::whereVendorNumber($pieces)->firstOrFail();
 		else {
 			$vendor = CurrentVendor::whereName($pieces)->firstOrFail();
 		}
