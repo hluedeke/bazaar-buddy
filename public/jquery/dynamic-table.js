@@ -43,13 +43,21 @@
 
             $(this).on("keydown", ".dynamic-row-trigger", function (event) {
 
-                if (event.which == 9) { // Tab is pressed
+                if (event.which == 9 || event.which == 13) { // Tab or enter is pressed
+                    event.preventDefault();
                     if ($(this).parents(".dynamic-row").is(':last-child')) {	// Check for last row
                         addRow(event, dynamicTable);
                     }
                     else {
                         $(this).parents(".dynamic-row").next().find(".dynamic-row-trigger").first().focus();
                     }
+                }
+            });
+
+            $(this).on("keydown", 'input[type="text"]', function(event) {
+                if(event.which == 13 && !$(this).hasClass(".dynamic-row-trigger")) {
+                    event.preventDefault();
+                    $(this).closest('td').next('td').find(':input').focus();
                 }
             });
 
