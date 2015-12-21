@@ -2,6 +2,7 @@
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 
 class Handler extends ExceptionHandler {
 
@@ -36,6 +37,9 @@ class Handler extends ExceptionHandler {
 	 */
 	public function render($request, Exception $e)
 	{
+		if($e instanceof TokenMismatchException) {
+			//return redirect()->back()->withErrors('There is an annoying session bug. Try again.')->with('_old_input', $request->all());
+		}
 		return parent::render($request, $e);
 	}
 

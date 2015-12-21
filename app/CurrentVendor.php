@@ -41,6 +41,24 @@ class CurrentVendor extends Model {
 		
 		return $vendor;
 	}
+
+	/**
+	 * @param $string
+	 * @return int|null|string
+	 */
+	public static function numberFromString($string)
+	{
+		$vendor = NULL;
+
+		$pieces = explode('-', $string);
+		if (count($pieces) >= 2)
+			$vendor = trim($pieces[0]);
+		else if (is_numeric($pieces))
+			$vendor = $pieces;
+
+
+		return $vendor;
+	}
 	
 	/**
 	 * Calculates total cash sales for this vendor at this bazaar

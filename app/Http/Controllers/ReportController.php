@@ -41,10 +41,55 @@ class ReportController extends Controller
 	/**
 	 * Display the main page
 	 *
-	 * @return void
+	 * @return view
 	 * @author Hannah
 	 */
 	public function index()
+	{
+		$bazaar = Bazaar::whereId($this->current_bazaar)->first();
+		$print  = null;    // Displays a print button based on the date for quick printing
+
+		if (Carbon::now()->between($bazaar->start_date, $bazaar->end_date->subDay())) {
+			$print = 'daily';
+		} else if (Carbon::now()->isSameDay($bazaar->end_date) || $bazaar->end_date->isPast()) {
+			$print = 'invoice';
+		}
+
+		return view('chair.reports.index', compact('bazaar', 'print'));
+	}
+
+	/**
+	 * Acts as the main controller to determine where actions go based on user query.
+	 *
+	 * @param Request $request
+	 * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	 */
+	public function report(Request $request)
+	{
+		if ($request->has('print_daily')) {
+			$date = Carbon::now();
+			if ($request->has('vendor')) {
+				$vendor_number = CurrentVendor::numberFromString($request->input('vendor'));
+				return $this->daily($request, $vendor_number, $date);
+			}
+			return $this->daily($request, null, $date);
+		} else if ($request->has('print_invoice')) {
+			if ($request->has('vendor')) {
+				$vendor_number = CurrentVendor::numberFromString($request->input('vendor'));
+				return redirect(action('ReportController@invoice', ['id' => $vendor_number]));
+			}
+		} else if ($request->has('vendor')) {
+			return redirect(action('ReportController@vendor'))->withInput();
+		} else {
+			return redirect(action('ReportController@rollup'));
+		}
+	}
+
+	/**
+	 * @param Request $request
+	 * @return \Illuminate\View\View
+	 */
+	public function rollup(Request $request)
 	{
 		$bazaar = Bazaar::whereId($this->current_bazaar)->with('vendorsByCheckout')->first();
 		$data   = array();
@@ -76,8 +121,8 @@ class ReportController extends Controller
 
 		// Checked out column
 		$checked_out = array();
-		foreach($bazaar->vendors as $vendor) {
-			if($vendor->pivot->checked_out) {
+		foreach ($bazaar->vendors as $vendor) {
+			if ($vendor->pivot->checked_out) {
 				$checked_out[] = $vendor->pivot->vendor_number;
 			}
 		}
@@ -97,7 +142,7 @@ class ReportController extends Controller
 		if (isset($warning))
 			$params['warning'] = $warning;
 
-		return view('chair.reports.index', $params);
+		return view('chair.reports.rollup', $params);
 	}
 
 	/**
@@ -124,12 +169,19 @@ class ReportController extends Controller
 	/**
 	 * Handles a vendor search request
 	 * @param $request
+	 * @param $id
 	 * @return view with vendor information
 	 * @author Hannah
 	 */
-	public function vendor(Request $request)
+	public function vendor(Request $request, $id = null)
 	{
-		$vendor = CurrentVendor::fromString($request->input('vendor'));
+		if ($id !== null) {
+			$vendor = CurrentVendor::whereVendorNumber($id)->first();
+		} else if ($request->old('vendor') !== null) {
+			$vendor = CurrentVendor::fromString($request->old('vendor'));
+		} else {
+			return redirect(action('ReportController@rollup'));
+		}
 
 		// Date report
 		$bazaar = Bazaar::find($this->current_bazaar);
@@ -538,9 +590,15 @@ class ReportController extends Controller
 		});
 	}
 
-	public function invoice($id)
+	public function invoice(Request $request, $id = null)
 	{
-		$vendor = CurrentVendor::whereVendorNumber($id)->first();
+		if ($id !== null) {
+			$vendors = array(CurrentVendor::whereVendorNumber($id)->firstOrFail());
+		} else if ($request->has('vendor_string')) {
+			$vendors = array(CurrentVendor::fromString($request->input('vendor_string')));
+		} else {
+			$vendors = CurrentVendor::all();
+		}
 		$bazaar = Bazaar::find($this->current_bazaar);
 		$cc_fee = AppSettings::whereName('credit_card_fee')->first();
 		$b_fee  = AppSettings::whereName('bazaar_fee')->first();
@@ -549,49 +607,53 @@ class ReportController extends Controller
 		$data   = array();
 		$totals = array();
 
-		for ($date = $bazaar->start_date; $date->lte($bazaar->end_date); $date->addDay()) {
-			$d = $date->format('j-M-Y');
+		foreach ($vendors as $vendor) {
+			for ($date = $bazaar->start_date; $date->lte($bazaar->end_date); $date->addDay()) {
+				$d = $date->format('j-M-Y');
 
-			$data[$d] = [
-				'cash' => 0,
-				'credit' => 0,
-				'layaway' => 0,
-			];
+				$data[$vendor->id][$d] = [
+					'cash' => 0,
+					'credit' => 0,
+					'layaway' => 0,
+				];
 
-			// Go through each sheet by date and add to daily total
-			foreach ($vendor->salesSheets() as $sheet) {
-				if ($sheet->date_of_sales->isSameDay($date)) {
-					$data[$d]['cash'] += $sheet->cash();
-					$data[$d]['credit'] += $sheet->credit();
-					$data[$d]['layaway'] += $sheet->layaway();
+				// Go through each sheet by date and add to daily total
+				foreach ($vendor->salesSheets() as $sheet) {
+					if ($sheet->date_of_sales->isSameDay($date)) {
+						$data[$vendor->id][$d]['cash'] += $sheet->cash();
+						$data[$vendor->id][$d]['credit'] += $sheet->credit();
+						$data[$vendor->id][$d]['layaway'] += $sheet->layaway();
+					}
 				}
+
+				$data[$vendor->id][$d]['cc_fee'] = $data[$vendor->id][$d]['credit'] * ($cc_fee / 100);
+				$data[$vendor->id][$d]['total']  = $data[$vendor->id][$d]['cash'] + $data[$vendor->id][$d]['credit'] + $data[$vendor->id][$d]['layaway'];
+
+				$cc_fee_total = $vendor->credit() * ($cc_fee / 100);
+				$b_fee_total  = $vendor->totalSales() * ($b_fee / 100);
+				$owedTotal	= $vendor->totalSales() - $vendor->layaway();	// The amount owed to vendor does not include layaway
+				$deduct       = $cc_fee_total + $b_fee_total + $vendor->table_fee + $vendor->audit_adjust;
+
+				// Totals
+				$totals[$vendor->id]['cash']         = number_format($vendor->cash(), 2);
+				$totals[$vendor->id]['credit']       = number_format($vendor->credit(), 2);
+				$totals[$vendor->id]['layaway']      = number_format($vendor->layaway(), 2);
+				$totals[$vendor->id]['total']        = number_format($vendor->totalSales(), 2);
+				$totals[$vendor->id]['cc_fee']       = number_format($cc_fee_total, 2);
+				$totals[$vendor->id]['b_fee']        = number_format($b_fee_total, 2);
+				$totals[$vendor->id]['deduct']       = number_format($deduct, 2);
+				$totals[$vendor->id]['owed']         = number_format($owedTotal - $deduct, 2);
+				$totals[$vendor->id]['table_fee']    = number_format($vendor->table_fee, 2);
+				$totals[$vendor->id]['audit_adjust'] = number_format($vendor->audit_adjust, 2);
+
+				// Format for pretty print
+				$data[$vendor->id][$d]['cash']    = number_format($data[$vendor->id][$d]['cash'], 2);
+				$data[$vendor->id][$d]['credit']  = number_format($data[$vendor->id][$d]['credit'], 2);
+				$data[$vendor->id][$d]['layaway'] = number_format($data[$vendor->id][$d]['layaway'], 2);
+				$data[$vendor->id][$d]['cc_fee']  = number_format($data[$vendor->id][$d]['cc_fee'], 2);
+				$data[$vendor->id][$d]['total']   = number_format($data[$vendor->id][$d]['total'], 2);
 			}
 
-			$data[$d]['cc_fee'] = $data[$d]['credit'] * ($cc_fee / 100);
-			$data[$d]['total']  = $data[$d]['cash'] + $data[$d]['credit'] + $data[$d]['layaway'];
-
-			$cc_fee_total = $vendor->credit() * ($cc_fee / 100);
-			$b_fee_total = $vendor->totalSales() * ($b_fee / 100);
-			$deduct = $cc_fee_total + $b_fee_total + $vendor->table_fee + $vendor->audit_adjust;
-
-			// Totals
-			$totals['cash']         = number_format($vendor->cash(), 2);
-			$totals['credit']       = number_format($vendor->credit(), 2);
-			$totals['layaway']      = number_format($vendor->layaway(), 2);
-			$totals['total']        = number_format($vendor->totalSales(), 2);
-			$totals['cc_fee']       = number_format($cc_fee_total, 2);
-			$totals['b_fee']        = number_format($b_fee_total, 2);
-			$totals['deduct']       = number_format($deduct, 2);
-			$totals['owed']         = number_format($vendor->totalSales() - $deduct, 2);
-			$totals['table_fee']    = number_format($vendor->table_fee, 2);
-			$totals['audit_adjust'] = number_format($vendor->audit_adjust, 2);
-
-			// Format for pretty print
-			$data[$d]['cash']    = number_format($data[$d]['cash'], 2);
-			$data[$d]['credit']  = number_format($data[$d]['credit'], 2);
-			$data[$d]['layaway'] = number_format($data[$d]['layaway'], 2);
-			$data[$d]['cc_fee']  = number_format($data[$d]['cc_fee'], 2);
-			$data[$d]['total']   = number_format($data[$d]['total'], 2);
 		}
 
 		$fees = array(
@@ -599,20 +661,26 @@ class ReportController extends Controller
 			'credit' => $cc_fee
 		);
 
-		return view('chair.reports.invoice', compact('vendor', 'bazaar', 'fees', 'data', 'totals'));
+		return view('chair.reports.invoice', compact('vendors', 'bazaar', 'fees', 'data', 'totals'));
 	}
 
-	public function daily(Request $request, $id = null)
+	public function daily(Request $request, $id = null, $date = null)
 	{
-		$date   = Carbon::createFromFormat('m-d-Y', $request->input('date'));
+		if (!$date) {
+			$date = Carbon::createFromFormat('m-d-Y', $request->input('date'));
+		}
 		$bazaar = Bazaar::find($this->current_bazaar);
 		$totals = array();
 
 		if ($id !== null) {
-			$vendors = array(CurrentVendor::find($id));
+			$vendors = array(CurrentVendor::whereVendorNumber($id)->firstOrFail());
+		}
+		else if ($request->has('vendor_number')) {
+			$vendors = array(CurrentVendor::whereVendorNumber($request->input('vendor_number'))->firstOrFail());
 		} else {
 			$vendors = CurrentVendor::all();
 		}
+
 		foreach ($vendors as $vendor) {
 			$totals[$vendor->id] = array(
 				'cash' => 0,

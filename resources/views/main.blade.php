@@ -20,7 +20,7 @@
 </head>
 <body>
 <div class="head">
-    <h1>Bazaar Buddy</h1>
+    <a href="{{ action('SalesSheetController@index') }}"><h1>Bazaar Buddy</h1></a>
 
     @if(Auth::user())
         <div class="welcome_info">
