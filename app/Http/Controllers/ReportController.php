@@ -78,6 +78,7 @@ class ReportController extends Controller
 				$vendor_number = CurrentVendor::numberFromString($request->input('vendor'));
 				return redirect(action('ReportController@invoice', ['id' => $vendor_number]));
 			}
+			return redirect(action('ReportController@invoice'));
 		} else if ($request->has('vendor')) {
 			return redirect(action('ReportController@vendor'))->withInput();
 		} else {
