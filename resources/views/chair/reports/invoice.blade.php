@@ -47,23 +47,22 @@
         </table>
         <div class="two-col">
             <div class="logo">
-                <img src="/images/logo.jpg" alt="AOCSC Logo"/>
-
+                <!--<img src="/images/logo.jpg" alt="AOCSC Logo"/>-->
+                <h1>Thank you!</h1>
                 <p>
-                    The Aviano Officers & Civilians Spouses'
-                    Club would like to thank you for your participation
+                    The {{ $bazaar->organization or '' }} would like to thank you for your participation
                     in the {{$bazaar->name}}! You help make
                     what we do possible!
                 </p>
             </div>
         </div>
         <div class="two-col">
-            <h1>BBB DEDUCTIONS</h1>
+            <h1>{{$bazaar->abbreviation or ''}} DEDUCTIONS</h1>
 
             <table class="label-group" border="0">
                 <tbody>
                 <tr>
-                    <td>BBB {{$fees['bazaar']}}%</td>
+                    <td>{{$bazaar->abbreviation or ''}} {{$fees['bazaar']}}%</td>
                     <td>${{$totals[$vendor->id]['b_fee']}}</td>
                 </tr>
                 <tr>
@@ -79,7 +78,7 @@
                     <td>${{ $totals[$vendor->id]['audit_adjust'] }}</td>
                 </tr>
                 <tr class="totals">
-                    <td>Total BBB Deductions</td>
+                    <td>Total {{$bazaar->abbreviation or ''}} Deductions</td>
                     <td>${{$totals[$vendor->id]['deduct']}}</td>
                 </tr>
                 </tbody>

@@ -133,11 +133,17 @@ class BazaarController extends Controller
 	public function update($id, Request $request)
 	{
 		$v = \Validator::make($request->all(), [
+			'org' => 'sometimes|required|max:100',
+			'abbr' => 'sometimes|required|max:10',
 			'name' => 'array',
 			'checkout' => 'array',
 			'currency' => 'array',
 			'number' => 'array',
+			'table_fee' => 'array',
+			'audit_adjust' => 'array',
 		], [
+			'org.required' => 'You must have a name for the organization that puts on your bazaar.',
+			'abbr.required' => 'Your bazaar must have an abbreviation for use on the vendor invoices.',
 			'required' => 'Something is missing for one of the vendors. Make sure you have all data for each vendor.',
 			'dollar_format' => 'All table fee and audit amounts must be in dollars.'
 		]);
@@ -153,6 +159,19 @@ class BazaarController extends Controller
 			return redirect()->back()->withErrors($v);
 		}
 
+		// Update any organization or abbreviation changes
+		if ($request->has('org') || $request->has('abbr')) {
+			$bazaar = Bazaar::findOrFail($id);
+			if ($request->has('org')) {
+				$bazaar->organization = $request->input('org');
+			}
+			if ($request->has('abbr')) {
+				$bazaar->abbreviation = $request->input('abbr');
+			}
+			$bazaar->save();
+		}
+
+
 		$ids      = $request->input('id');
 		$names    = $request->input('name');
 		$checkout = $request->input('checkout');
@@ -160,55 +179,61 @@ class BazaarController extends Controller
 
 		// Parse our dollar formats for table fees/audit adjustments
 		$table_fees = array();
-		foreach($request->input('table_fee') as $fee) {
-			if ($fee != '')
-				$table_fees[] = (float)preg_replace("/([^0-9\\.-])/i", "", $fee);
+		if ($request->has('table_fee')) {
+			foreach ($request->input('table_fee') as $fee) {
+				if ($fee != '')
+					$table_fees[] = (float)preg_replace("/([^0-9\\.-])/i", "", $fee);
+			}
 		}
 
 		$audit_adjusts = array();
-		foreach($request->input('audit_adjust') as $fee) {
-		if ($fee != '')
-			$audit_adjusts[] = (float)preg_replace("/([^0-9\\.-])/i", "", $fee);
+		if ($request->has('audit_adjust')) {
+			foreach ($request->input('audit_adjust') as $fee) {
+				if ($fee != '')
+					$audit_adjusts[] = (float)preg_replace("/([^0-9\\.-])/i", "", $fee);
+			}
 		}
 
 
-		foreach ($request->input('number') as $i => $vendor_num) {
-			if ($vendor_num) {
+		if ($request->has('number')) {
+			foreach ($request->input('number') as $i => $vendor_num) {
+				if ($vendor_num) {
 
-				if(!isset($table_fees[$i]))
-					$table_fees[$i] = '';
-				if(!isset($audit_adjusts[$i]))
-					$audit_adjusts[$i] = '';
+					if (!isset($table_fees[$i]))
+						$table_fees[$i] = '';
+					if (!isset($audit_adjusts[$i]))
+						$audit_adjusts[$i] = '';
 
-				try {
-					if ($ids[$i])
-						$vendor = Vendor::findOrFail($ids[$i]);
-					else
-						$vendor = Vendor::whereName($names[$i])->firstOrFail();
-					$vendor->name    = $names[$i];
-					$vendor->payment = $currency[$i];
-					$vendor->save();
-				} catch (ModelNotFoundException $e) {
-					$vendor          = new Vendor;
-					$vendor->name    = $names[$i];
-					$vendor->payment = $currency[$i];
-					$vendor->save();
-				}
-				try {
-					$vendor->bazaars()->findOrFail($id);
-					$vendor->bazaars()->updateExistingPivot($id, [
-						'vendor_number' => $vendor_num,
-						'checkout' => $checkout[$i],
-						'table_fee' => $table_fees[$i],
-						'audit_adjust' => $audit_adjusts[$i],
-					]);
-				} catch (ModelNotFoundException $e) {
-					$vendor->bazaars()->attach($id, [
-						'vendor_number' => $vendor_num,
-						'checkout' => $checkout[$i],
-						'table_fee' => $table_fees[$i],
-						'audit_adjust' => $audit_adjusts[$i],
-					]);
+					try {
+						if ($ids[$i])
+							$vendor = Vendor::findOrFail($ids[$i]);
+						else
+							$vendor = Vendor::whereName($names[$i])->firstOrFail();
+						$vendor->name    = $names[$i];
+						$vendor->payment = $currency[$i];
+						$vendor->save();
+					} catch (ModelNotFoundException $e) {
+						$vendor          = new Vendor;
+						$vendor->name    = $names[$i];
+						$vendor->payment = $currency[$i];
+						$vendor->save();
+					}
+					try {
+						$vendor->bazaars()->findOrFail($id);
+						$vendor->bazaars()->updateExistingPivot($id, [
+							'vendor_number' => $vendor_num,
+							'checkout' => $checkout[$i],
+							'table_fee' => $table_fees[$i],
+							'audit_adjust' => $audit_adjusts[$i],
+						]);
+					} catch (ModelNotFoundException $e) {
+						$vendor->bazaars()->attach($id, [
+							'vendor_number' => $vendor_num,
+							'checkout' => $checkout[$i],
+							'table_fee' => $table_fees[$i],
+							'audit_adjust' => $audit_adjusts[$i],
+						]);
+					}
 				}
 			}
 		}

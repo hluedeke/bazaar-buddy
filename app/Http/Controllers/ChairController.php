@@ -153,9 +153,8 @@ class ChairController extends Controller
 			}
 		}
 
-		//return Redirect::to(action('ChairController@review', ['id' => $id]));
 		Session::flash('message', "Sheet $id has been updated successfully.");
-		return Redirect::to(action('ChairController@index'));
+		return Redirect::to(action('ChairController@review', ['id' => $id]));
 	}
 
 	/**

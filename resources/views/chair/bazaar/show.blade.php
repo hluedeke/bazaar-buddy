@@ -36,8 +36,7 @@
         </div>
         <!-- End errors -->
 
-        <h2>Vendors</h2>
-
+        <!-- Example row -->
         <table style="display: none">
             <tr class="dynamic-row">
                 <td><input type="text" name="number[]"/><input type="hidden" name="id[]"/></td>
@@ -58,8 +57,30 @@
                     </a></td>
             </tr>
         </table>
+        <!-- End example row -->
 
         {!! Form::open(['action' => ['BazaarController@update', $bazaar->id]]) !!}
+        <div class="form-row">
+            <label>Organization: </label>
+            <input id="org" type="text" name="org" value="{{$bazaar->organization or old('org')}}"
+                   style="width: 300px; display: none;" disabled="disabled"/>
+            <span id="org-txt">{{$bazaar->organization or ''}}</span>
+            <a id="org-edit" class="txt-edit" href="#">
+                <span class="ui-icon ui-icon-pencil"></span>
+            </a>
+        </div>
+        <div class="form-row">
+            <label>Bazaar Abbreviation: </label>
+            <input id="abbr" type="text" name="abbr" value="{{$bazaar->abbreviation or old('abbr')}}"
+                   style="width: 50px; display: none;" disabled="disabled"/>
+            <span id="abbr-txt">{{$bazaar->abbreviation or ''}}</span>
+            <a id="abbr-edit" class="txt-edit" href="#">
+                <span class="ui-icon ui-icon-pencil"></span>
+            </a>
+        </div>
+
+        <h2>Vendors</h2>
+
         <table id="vendor-table" border="0">
             <thead>
             <tr>
@@ -192,16 +213,29 @@
                 });
             }
 
-            $(document).on('row-added', function() {
+            $(document).on('row-added', function () {
                 var element = $('.dynamic-row:last');
                 vendorAC($(element).find('.vendor-name'));
             });
 
             // Run our dollar-formatting algorithm on dollar-related input fields
-            $(document).on("blur", ".dollar-amount", function(event) {
+            $(document).on("blur", ".dollar-amount", function (event) {
                 var dollarAmount = formatDollar(this.value);
                 this.value = dollarAmount;
             });
+        });
+
+        $('.txt-edit').click(function (event) {
+            switch (event.currentTarget.id) {
+                case 'abbr-edit':
+                    $('#abbr-txt, #abbr-edit').hide();
+                    $('#abbr').show().removeAttr('disabled');
+                    break;
+                case 'org-edit':
+                    $('#org-txt, #org-edit').hide();
+                    $('#org').show().removeAttr('disabled');
+                    break;
+            }
         });
     </script>
 @stop

@@ -13,11 +13,7 @@
     {!! Form::open() !!}
     <div class="form-box">
 
-        @if(Session::has('error'))
-            <div class="ui-state-error ui-corner-all">
-                <span class="ui-icon ui-icon-alert"></span><span>{{ Session::get('error') }}</span>
-            </div>
-        @endif
+        @include('errors._message')
 
         <div class="form-row">
             {!! Form::label('date_of_sales', 'Date') !!}

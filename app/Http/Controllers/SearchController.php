@@ -66,10 +66,11 @@ class SearchController extends Controller
 				->where('sales.terminal_id', 'LIKE', "$query%")
 				->orWhere('sequence_id', 'LIKE', "$query%")->get();
 
-			//$receipt_nums = Sale::where('receipt_number', 'LIKE', "$query%")->get();
-			//$term_ids     = Sale::where('terminal_id', 'LIKE', "$query%")->orWhere('sequence_id', 'LIKE', "$query%")->get();
 			$sheets = SalesSheet::where('sheet_number', 'LIKE', "$query%")->whereBazaarId($this->current_bazaar)->get();
 
+			$vendors = CurrentVendor::where('vendor_number', 'LIKE', "$query%")->get();
+
+			// Populate dropdown with fetched results
 			foreach ($sheets as $s) {
 				$data[] = [
 					'category' => 'Sheet Number',
@@ -89,6 +90,13 @@ class SearchController extends Controller
 					'category' => 'Terminal ID, Sequence Num',
 					'value' => $t->terminal_id . ", " . $t->sequence_id . " (" . $t->sheet_number . ")",
 					'id' => $t->sheet_number
+				);
+			}
+			foreach ($vendors as $v) {
+				$data[] = array(
+					'category' => 'Vendor',
+					'value' => $v->vendor_number . " - " . $v->name,
+					'id' => $v->id
 				);
 			}
 		}

@@ -662,7 +662,7 @@ class ReportController extends Controller
 			'credit' => $cc_fee
 		);
 
-		return view('chair.reports.invoice', compact('vendors', 'bazaar', 'fees', 'data', 'totals'));
+		return view('chair.reports.invoice', compact('vendors', 'bazaar', 'fees', 'data', 'totals', 'organization'));
 	}
 
 	public function daily(Request $request, $id = null, $date = null)
