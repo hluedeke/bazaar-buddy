@@ -50,19 +50,24 @@
                 <!--<img src="/images/logo.jpg" alt="AOCSC Logo"/>-->
                 <h1>Thank you!</h1>
                 <p>
-                    The {{ $bazaar->organization or '' }} would like to thank you for your participation
+                    @if(isset($bazaar->organization) && $bazaar->organization != '')
+                        The {{ $bazaar->organization }}
+                    @else
+                        We
+                    @endif
+                    would like to thank you for your participation
                     in the {{$bazaar->name}}! You help make
                     what we do possible!
                 </p>
             </div>
         </div>
         <div class="two-col">
-            <h1>{{$bazaar->abbreviation or ''}} DEDUCTIONS</h1>
+            <h1>{{$bazaar->abbreviation or 'BBB'}} DEDUCTIONS</h1>
 
             <table class="label-group" border="0">
                 <tbody>
                 <tr>
-                    <td>{{$bazaar->abbreviation or ''}} {{$fees['bazaar']}}%</td>
+                    <td>{{$bazaar->abbreviation or 'BBB'}} {{$fees['bazaar']}}%</td>
                     <td>${{$totals[$vendor->id]['b_fee']}}</td>
                 </tr>
                 <tr>
@@ -78,7 +83,7 @@
                     <td>${{ $totals[$vendor->id]['audit_adjust'] }}</td>
                 </tr>
                 <tr class="totals">
-                    <td>Total {{$bazaar->abbreviation or ''}} Deductions</td>
+                    <td>Total {{$bazaar->abbreviation or 'BBB'}} Deductions</td>
                     <td>${{$totals[$vendor->id]['deduct']}}</td>
                 </tr>
                 </tbody>
