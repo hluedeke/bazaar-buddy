@@ -62,7 +62,7 @@ class SalesSheetController extends Controller
 	 */
 	public function show($id)
 	{
-		$sheet = SalesSheet::where('sheet_number', '=', $id)->firstOrFail();
+		$sheet = SalesSheet::where('sheet_number', '=', $id)->whereBazaarId($this->current_bazaar)->firstOrFail();
 		return view('main\sales_sheet\show', compact('sheet'));
 	}
 
