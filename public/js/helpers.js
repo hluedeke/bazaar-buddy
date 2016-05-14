@@ -6,6 +6,5 @@ function formatDollar(input, showZero) {
         input = input.replace(/\$|,/g, '');
 
     var n = Number(input);
-    alert(n);
     return n.toLocaleString('en-EN', {style: 'currency', currency: 'USD', minimumFractionDigits: 2});
 }
