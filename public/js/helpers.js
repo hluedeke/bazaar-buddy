@@ -3,8 +3,9 @@ function formatDollar(input, showZero) {
         return (typeof showZero !== 'undefined') ? '$0.00' : '';
     }
     if (typeof(input) == 'string')
-        input = input.replace(/\$/g, '');
+        input = input.replace(/\$|,/g, '');
 
     var n = Number(input);
+    alert(n);
     return n.toLocaleString('en-EN', {style: 'currency', currency: 'USD', minimumFractionDigits: 2});
 }

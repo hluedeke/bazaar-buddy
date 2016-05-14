@@ -48,7 +48,7 @@ class SalesSheetController extends Controller
 	{
 		$salesSheets = SalesSheet::whereCreatedBy(Auth::user()->id)->whereBazaarId($this->current_bazaar)
 			->orderBy('updated_at', 'DESC')->get();
-		$validated   = SalesSheet::whereValidatedBy(Auth::user()->id)->whereBazaarId($this->current_bazaar)->get();
+		$validated = SalesSheet::whereValidatedBy(Auth::user()->id)->whereBazaarId($this->current_bazaar)->get();
 
 		return view('main\sales_sheet\home', ['salesSheets' => $salesSheets, 'validated' => $validated]);
 	}
