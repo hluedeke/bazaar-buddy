@@ -68,7 +68,8 @@ class Vendor extends Model
 	public function isValidated($date = null)
 	{
 		foreach ($this->salesSheets as $sheet) {
-			if (($date && $sheet->date_of_sales->isSameDay($date)) && $sheet->getValidationStatus()
+			if ((($date != null && $sheet->date_of_sales->isSameDay($date)) || $date === null) &&
+            $sheet->getValidationStatus()
                 != Validated::CORRECT) {
 				return false;
 			}
