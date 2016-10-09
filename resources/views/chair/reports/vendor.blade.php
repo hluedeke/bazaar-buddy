@@ -30,17 +30,24 @@
                     <th>Credit Card Totals</th>
                     <th>Layaway Totals</th>
                     <th>Total Sales</th>
+                    <th>Valid</th>
                 </tr>
                 </thead>
                 <tbody>
                 @forelse($vendor->salesSheets() as $sheet)
                     <tr>
                         <td>{{$sheet->date_of_sales->format('m/d/Y')}}</td>
-                        <td>{{$sheet->sheet_number}}</td>
+                        <td><a href="{{action('ChairController@review', ['id' => $sheet->sheet_number])}}">
+                            {{$sheet->sheet_number}}</a></td>
                         <td class="dollar-amount">{{$sheet->cash()}}</td>
                         <td class="dollar-amount">{{$sheet->credit()}}</td>
                         <td class="dollar-amount">{{$sheet->layaway()}}</td>
                         <td class="dollar-amount">{{$sheet->totalSales()}}</td>
+                        @if(($status = $sheet->getValidationStatus()) == Validated::CORRECT)
+                            <td>{{ $status }}</td>
+                        @else
+                            <td class="error">{{ $status }}</td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -49,7 +56,7 @@
                 @endforelse
                 @if(!$vendor->salesSheets()->isEmpty())
                     <tr>
-                        <th colspan="6">Totals</th>
+                        <th colspan="7">Totals</th>
                     </tr>
                     <tr>
                         <td></td>
@@ -58,6 +65,7 @@
                         <td class="dollar-amount">{{$vendor->credit()}}</td>
                         <td class="dollar-amount">{{$vendor->layaway()}}</td>
                         <td class="dollar-amount">{{$vendor->totalSales()}}</td>
+                        <td></td>
                     </tr>
                 @endif
                 </tbody>
@@ -115,16 +123,26 @@
                         <th>Credit Card Totals</th>
                         <th>Layaway Totals</th>
                         <th>Total Sales</th>
+                        <th>Valid</th>
                     </tr>
                     </thead>
                     <tbody>
                     @forelse($data['sheets'] as $number => $sheet)
                         <tr>
-                            <td>{{$number}}</td>
+                            <td>
+                                <a href="{{action('ChairController@review', ['id' => $number]) }}">
+                                {{$number}}
+                                </a>
+                            </td>
                             <td class="dollar-amount">{{$sheet[SalesType::CASH]}}</td>
                             <td class="dollar-amount">{{$sheet[SalesType::CARD]}}</td>
                             <td class="dollar-amount">{{$sheet[SalesType::LAYAWAY]}}</td>
                             <td class="dollar-amount">{{$sheet['total']}}</td>
+                            @if($sheet['status'] == Validated::CORRECT)
+                                <td>{{ $sheet['status'] }}</td>
+                            @else
+                                <td class="error">{{ $sheet['status'] }}</td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
@@ -141,6 +159,7 @@
                             <td class="dollar-amount">{{$data[SalesType::CARD]}}</td>
                             <td class="dollar-amount">{{$data[SalesType::LAYAWAY]}}</td>
                             <td class="dollar-amount">{{$data['total']}}</td>
+                            <td>{{$data['status']}}</td>
                         </tr>
                     @endif
                     </tbody>

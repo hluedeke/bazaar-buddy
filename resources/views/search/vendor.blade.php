@@ -32,7 +32,13 @@
                     <td>{{$sheet->updated_at}}</td>
                     <td>{{$sheet->createdBy->name or 'N/A'}}</td>
                     <td>{{$sheet->validatedBy->name or 'N/A' }}</td>
-                    <td>{{$sheet->getValidationStatus()}}</td>
+
+                    @if(($status = $sheet->getValidationStatus()) == Validated::CORRECT ||
+                        $status == Validated::PENDING)
+                        <td>{{$status}}</td>
+                    @else
+                        <td class="error">{{$status}}</td>
+                    @endif
                 </tr>
             @endforeach
             </tbody>
@@ -43,10 +49,9 @@
 @section('scripts')
     <script type="text/javascript">
         $(document).ready(function () {
-                    $("#sort-table").tablesorter({
-                        sortList: [[0, 0]],
-                    });
-                }
-        );
+            $("#sort-table").tablesorter({
+                sortList: [[0, 0]],
+            });
+        });
     </script>
 @stop

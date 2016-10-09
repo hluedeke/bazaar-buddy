@@ -200,7 +200,8 @@ td.dynamic-row-num {
   width: 10px; }
 
 td.error {
-  color: #ff0000; }
+  background-color: #e8be77;
+  color: #855f1e; }
 
 .fixed-header {
   position: fixed;

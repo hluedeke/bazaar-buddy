@@ -12,7 +12,8 @@
 	</div>
 
 	<div class="form-box">
-		@include('main\sales_sheet\_salestable', array('sales'=> $sheet->sales, 'status' => 'true' ))
+		@include('/main/sales_sheet/_salestable', array('sales'=> $sheet->sales, 'status' =>
+		'true' ))
 	</div>
 
 	<a href="{{ action('MainController@index') }}">

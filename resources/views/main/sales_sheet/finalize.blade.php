@@ -1,7 +1,7 @@
 @extends('main')
 	
 @section('content')
-	@include('main/sales_sheet/_wizardbar', ['active_tab' => 3])
+	@include('/main/sales_sheet/_wizardbar', ['active_tab' => 3])
 
 	<div class="text-center">
 		<h1>Sheet {{ $sheet->sheet_number }}</h1>
@@ -15,7 +15,7 @@
 	</div>
 	
 	<div class="form-box">
-		@include('main\sales_sheet\_salestable', array('sales'=> $sales ))
+		@include('/main/sales_sheet/_salestable', array('sales'=> $sales ))
 	</div>
 	
 	{!! Form::open() !!}

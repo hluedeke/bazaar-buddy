@@ -51,7 +51,7 @@ class ChairController extends Controller
 			if ($sheet->getValidationStatus() != Validated::CORRECT && $sheet->getValidationStatus() != Validated::PENDING)
 				$sheets[] = $sheet;
 		}
-		return view('chair/home', ['sheets' => $sheets]);
+		return view('/chair/home', ['sheets' => $sheets]);
 	}
 
 	/**
@@ -64,7 +64,7 @@ class ChairController extends Controller
 	{
 		try {
 			$sheet = SalesSheet::whereSheetNumber($id)->firstOrFail();
-			return view('chair/review', ['sheet' => $sheet]);
+			return view('/chair/review', ['sheet' => $sheet]);
 		} catch (ModelNotFoundException $e) {
 			return Redirect::to(action('ChairController@index'));
 		}

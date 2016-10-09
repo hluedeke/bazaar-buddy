@@ -50,7 +50,8 @@ class SalesSheetController extends Controller
 			->orderBy('updated_at', 'DESC')->get();
 		$validated = SalesSheet::whereValidatedBy(Auth::user()->id)->whereBazaarId($this->current_bazaar)->get();
 
-		return view('main\sales_sheet\home', ['salesSheets' => $salesSheets, 'validated' => $validated]);
+		return view('/main/sales_sheet/home', ['salesSheets' => $salesSheets, 'validated' =>
+            $validated]);
 	}
 
 	/**
@@ -63,7 +64,7 @@ class SalesSheetController extends Controller
 	public function show($id)
 	{
 		$sheet = SalesSheet::where('sheet_number', '=', $id)->whereBazaarId($this->current_bazaar)->firstOrFail();
-		return view('main\sales_sheet\show', compact('sheet'));
+		return view('/main/sales_sheet/show', compact('sheet'));
 	}
 
 	/**
@@ -83,7 +84,8 @@ class SalesSheetController extends Controller
 			$curr_date = $sheet->date_of_sales->format('m/d/Y');
 		}
 
-		return view('main\sales_sheet\create_info', ['sheet' => $sheet, 'curr_date' => $curr_date]);
+		return view('/main/sales_sheet/create_info', ['sheet' => $sheet, 'curr_date' =>
+            $curr_date]);
 	}
 
 	/**
@@ -182,7 +184,7 @@ class SalesSheetController extends Controller
 					};
 			}
 
-			return view('main\sales_sheet\create_sales', [
+			return view('/main/sales_sheet/create_sales', [
 				'sheet' => $sheet,
 				'pending_id' => Validated::PENDING,
 				'cash_sales' => $cash_sales,
@@ -276,7 +278,7 @@ class SalesSheetController extends Controller
 			$sheet = Session::get('sheet');
 			$sales = Session::get('sheet_sales');
 
-			return view('main\sales_sheet\finalize', ['sheet' => $sheet, 'sales' => $sales]);
+			return view('/main/sales_sheet/finalize', ['sheet' => $sheet, 'sales' => $sales]);
 		} else {
 			return Redirect::to(action('SalesSheetController@createSales'));
 		}
@@ -341,7 +343,7 @@ class SalesSheetController extends Controller
 	public function edit($id)
 	{
 		$sheet = SalesSheet::whereSheetNumber($id)->firstOrFail();
-		return view('main\sales_sheet\edit', ['sheet' => $sheet]);
+		return view('/main/sales_sheet/edit', ['sheet' => $sheet]);
 	}
 
 	/**

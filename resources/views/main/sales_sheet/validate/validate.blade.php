@@ -1,7 +1,7 @@
 @extends('main')
 	
 @section('content')
-	@include('main\sales_sheet\validate\_wizardbar', ['active_tab' => 2])
+	@include('/main/sales_sheet/validate/_wizardbar', ['active_tab' => 2])
 	
 <div class="text-center">
 	<h1>Sheet {{ $sheet->sheet_number }}</h1>

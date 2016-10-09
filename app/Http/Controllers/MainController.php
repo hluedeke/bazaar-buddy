@@ -23,7 +23,7 @@ class MainController extends Controller {
 		if(Auth::check())
 			return Redirect::to(action('SalesSheetController@index'));
 		else
-			return view('main\home');
+			return view('/main/home');
 	}
 	
 	/**

@@ -13,7 +13,7 @@
 </div>
 
 <div class="form-box">
-	@include('main\sales_sheet\_salestable', array('sales'=> $sheet->sales ))
+	@include('/main/sales_sheet/_salestable', array('sales'=> $sheet->sales ))
 </div>
 
 <a href="{{ URL::previous() }}">

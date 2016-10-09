@@ -7,7 +7,7 @@
 @section('content')
     <div class="text-center"><h1>Review</h1>
 
-        <h2>Sheet {{ $sheet->sheet_number }}</h2></div>
+        <h2>Sheet {{ $sheet->sheet_number }} ({{ $sheet->getValidationStatus() }})</h2></div>
 
 
     {!! Form::open() !!}

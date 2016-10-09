@@ -36,7 +36,7 @@ class ValidationController extends Controller
 	public function show($id)
 	{
 		$sheet = SalesSheet::where('sheet_number', '=', $id)->firstOrFail();
-		return view('main\sales_sheet\validate\show', compact('sheet'));
+		return view('/main/sales_sheet/validate/show', compact('sheet'));
 	}
 
 	/**
@@ -57,7 +57,7 @@ class ValidationController extends Controller
 			// Validation
 			return $this->validateSheetNumber($request, $sheetNumber[0]);
 		}
-		return view('main\sales_sheet\validate\select');
+		return view('/main/sales_sheet/validate/select');
 	}
 
 	/**
@@ -86,7 +86,7 @@ class ValidationController extends Controller
 		}
 
 
-		return view('main\sales_sheet\validate\validate', array(
+		return view('/main/sales_sheet/validate/validate', array(
 			'sheet' => $sheet,
 			'sales' => $sales,
 			'old' => $old,
@@ -172,7 +172,7 @@ class ValidationController extends Controller
 		}
 		$sheet_total = $sheet->cash() + $sheet->layaway() + $cc_total;
 
-		return view('main\sales_sheet\validate\finalize', array(
+		return view('/main/sales_sheet/validate/finalize', array(
 			'sheet' => $sheet,
 			'failed' => $failed,
 			'sales' => $sales,

@@ -24,17 +24,27 @@
                     <th>Credit Card</th>
                     <th>Layaway</th>
                     <th>Total</th>
+                    <th>Valid</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($tab['data'] as $i => $row)
                     @if($i !== 'totals')
                         <tr>
-                            <td>{{ $row['Vendor Number'] }}</td>
+                            <td>
+                                <a href="/chair/reports/vendor/{{ $row['id'] }}" target="vendor">
+                                    {{ $row['Vendor Number'] }}
+                                </a>
+                            </td>
                             <td class="dollar-amount">{{ $row[SalesType::CASH] }}</td>
                             <td class="dollar-amount">{{ $row[SalesType::CARD] }}</td>
                             <td class="dollar-amount">{{ $row[SalesType::LAYAWAY] }}</td>
                             <td class="dollar-amount">{{ $row['Total'] }}</td>
+                            @if($row['Valid'] == 'no')
+                                <td class="error">{{ $row['Valid'] }}</td>
+                            @else
+                                <td>{{ $row['Valid'] }}</td>
+                            @endif
                         </tr>
                     @endif
                 @endforeach
@@ -44,6 +54,7 @@
                     <th>Credit Card</th>
                     <th>Layaway</th>
                     <th>Total</th>
+                    <th>Valid</th>
                 </tr>
                 <tr>
                     <td></td>
@@ -51,6 +62,11 @@
                     <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::CARD] }}</td>
                     <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::LAYAWAY] }}</td>
                     <td class="dollar-amount">{{ $tab['data']['totals']['Total'] }}</td>
+                    @if($tab['data']['totals']['Valid'] == 'no')
+                        <td class="error">{{ $tab['data']['totals']['Valid'] }}</td>
+                    @else
+                        <td>{{ $tab['data']['totals']['Valid'] }}</td>
+                    @endif
                 </tr>
                 </tbody>
             </table>
@@ -84,6 +100,13 @@
                         @foreach($row as $title => $data)
                             @if(in_array($title, $rollupCols))
                                 <td class="dollar-amount">{{ $data }}</td>
+                            @elseif($title == 'Valid' && $data == 'no')
+                                <td class="error">{{ $data }}</td>
+                            @elseif($title == 'Vendor Number')
+                                <td>
+                                    <a href="/chair/reports/vendor/{{ $data }}" target="vendor">
+                                        {{ $data }}
+                                    </a></td>
                             @else
                                 <td>{{ $data }}</td>
                             @endif
