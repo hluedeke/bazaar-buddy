@@ -10,7 +10,6 @@
 			{!! Form::label('name', 'First & Last Name: ') !!}
 			{!! Form::text('name', NULL, ['style' => 'width: 300px;']) !!}
 		</div>
-		
 	</div>
 	{!! Form::submit('Login', ['class' => 'next']) !!}
 	
