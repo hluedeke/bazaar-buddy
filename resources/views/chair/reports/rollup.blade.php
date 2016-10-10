@@ -16,7 +16,7 @@
         <div id="{{$id}}" class="tab-box">
             @include('errors._warning')
             <div class="text-center"><h2>{{ $tab['title'] }}</h2></div>
-            <table border="0">
+            <table border="0" class="numeric">
                 <thead>
                 <tr>
                     <th>Vendor Number</th>
@@ -36,10 +36,10 @@
                                     {{ $row['Vendor Number'] }}
                                 </a>
                             </td>
-                            <td class="dollar-amount">{{ $row[SalesType::CASH] }}</td>
-                            <td class="dollar-amount">{{ $row[SalesType::CARD] }}</td>
-                            <td class="dollar-amount">{{ $row[SalesType::LAYAWAY] }}</td>
-                            <td class="dollar-amount">{{ $row['Total'] }}</td>
+                            <td>{{ Money::format($row[SalesType::CASH]) }}</td>
+                            <td>{{ Money::format($row[SalesType::CARD]) }}</td>
+                            <td>{{ Money::format($row[SalesType::LAYAWAY]) }}</td>
+                            <td>{{ Money::format($row['Total']) }}</td>
                             @if($row['Valid'] == 'no')
                                 <td class="error">{{ $row['Valid'] }}</td>
                             @else
@@ -58,10 +58,10 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::CASH] }}</td>
-                    <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::CARD] }}</td>
-                    <td class="dollar-amount">{{ $tab['data']['totals'][SalesType::LAYAWAY] }}</td>
-                    <td class="dollar-amount">{{ $tab['data']['totals']['Total'] }}</td>
+                    <td>{{ Money::format($tab['data']['totals'][SalesType::CASH]) }}</td>
+                    <td>{{ Money::format($tab['data']['totals'][SalesType::CARD]) }}</td>
+                    <td>{{ Money::format($tab['data']['totals'][SalesType::LAYAWAY]) }}</td>
+                    <td>{{ Money::format($tab['data']['totals']['Total']) }}</td>
                     @if($tab['data']['totals']['Valid'] == 'no')
                         <td class="error">{{ $tab['data']['totals']['Valid'] }}</td>
                     @else
@@ -85,7 +85,7 @@
         <div id="bazaar-tab-rollup" class="tab-box">
             @include('errors._warning')
             <div class="text-center"><h2>Roll Up</h2></div>
-            <table border="0">
+            <table border="0" class="numeric">
                 <thead>
                 <tr>
                     @foreach($rollup[0] as $title=>$data)
@@ -98,9 +98,7 @@
                 @foreach($rollup as $i => $row)
                     <tr>
                         @foreach($row as $title => $data)
-                            @if(in_array($title, $rollupCols))
-                                <td class="dollar-amount">{{ $data }}</td>
-                            @elseif($title == 'Valid' && $data == 'no')
+                            @if($title == 'Valid' && $data == 'no')
                                 <td class="error">{{ $data }}</td>
                             @elseif($title == 'Vendor Number')
                                 <td>
@@ -108,7 +106,7 @@
                                         {{ $data }}
                                     </a></td>
                             @else
-                                <td>{{ $data }}</td>
+                                <td>{{ Money::format($data, true) }}</td>
                             @endif
                         @endforeach
                         @if($row['Checkout Order'] != 'TOTALS')

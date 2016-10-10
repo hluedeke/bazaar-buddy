@@ -3,8 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
-use App\Validated;
-use App\SalesType;
+use DB;
 
 class SalesSheet extends Model {
 
@@ -67,78 +66,59 @@ class SalesSheet extends Model {
 	/**
 	 * Calculates total cash sales for this sales sheet
 	 *
-	 * @return void
+	 * @return int
 	 * @author Hannah
 	 */
 	public function cash() {
-		$total = 0;
-		
-		foreach($this->sales as $sale) {
-			if($sale->sales_type == SalesType::CASH) {
-				$total += $sale['amount'];
-			}
-		}
-		
-		return $total;
+        return DB::table('sales')
+            ->where('sales_sheet_id', '=', $this->id)
+            ->where('sales_type', '=', SalesType::CASH)
+            ->sum('amount');
 	}
 	
 	/**
 	 * Calculates total credit sales for this sales sheet
 	 *
-	 * @return void
+	 * @return int amount
 	 * @author Hannah
 	 */
 	public function credit() {
-		$total = 0;
-		
-		foreach($this->sales as $sale) {
-			if($sale->sales_type == SalesType::CARD) {
-				$total += $sale['amount'];
-			}
-		}
-		
-		return $total;
+        return DB::table('sales')
+            ->where('sales_sheet_id', '=', $this->id)
+            ->where('sales_type', '=', SalesType::CARD)
+            ->sum('amount');
 	}
 	
 	/**
 	 * Calculates total credit sales for this sales sheet
 	 *
-	 * @return void
+	 * @return int amount
 	 * @author Hannah
 	 */
 	public function layaway() {
-		$total = 0;
-		
-		foreach($this->sales as $sale) {
-			if($sale->sales_type == SalesType::LAYAWAY) {
-				$total += $sale['amount'];
-			}
-		}
-		
-		return $total;
+		return DB::table('sales')
+            ->where('sales_sheet_id', '=', $this->id)
+            ->where('sales_type', '=', SalesType::LAYAWAY)
+            ->sum('amount');
 	}
 	
 	/**
 	 * Calculates total layaway sales for this sales sheet
 	 *
-	 * @return total sales
+	 * @return int sales
 	 * @author Hannah
 	 */
 	public function totalSales($sales = null)
 	{
-		$total = 0;
-		if($sales == null) {
-			foreach($this->sales as $sale) {
-				$total += $sale['amount'];
-			}
-		}
-		else {
+	    if($sales == null)
+	        return DB::table('sales')->where('sales_sheet_id', '=', $this->id)->sum('amount');
+        else {
+            $total = 0;
 			foreach($sales as $sale) {
 				$total += $sale['amount'];
 			}
-		}
-		
-		return $total;
+			return $total;
+	    }
 	}
 	
 	// Updated At accessor

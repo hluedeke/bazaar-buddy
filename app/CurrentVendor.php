@@ -53,9 +53,8 @@ class CurrentVendor extends Model {
 		$pieces = explode('-', $string);
 		if (count($pieces) >= 2)
 			$vendor = trim($pieces[0]);
-		else if (is_numeric($pieces))
-			$vendor = $pieces;
-
+		else if (is_numeric($pieces[0]))
+			$vendor = $pieces[0];
 
 		return $vendor;
 	}

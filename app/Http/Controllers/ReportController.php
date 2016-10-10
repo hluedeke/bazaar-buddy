@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 
 use App\AppSettings;
 use App\Bazaar;
+use App\Money;
 use App\SalesType;
 use App\CurrentVendor;
 
@@ -81,7 +82,8 @@ class ReportController extends Controller
             }
             return redirect(action('ReportController@invoice'));
         } else if ($request->has('vendor')) {
-            return redirect(action('ReportController@vendor'))->withInput();
+            $vendor_number = CurrentVendor::numberFromString($request->input('vendor'));
+            return redirect(action('ReportController@vendor', ['id' => $vendor_number]));
         } else {
             return redirect(action('ReportController@rollup'));
         }
@@ -112,14 +114,6 @@ class ReportController extends Controller
 
         $ccFee = $this->creditCard * 100;
         $fee = $this->fee * 100;
-        $rollupCols = [
-            'Total Cash Sales',
-            'Total Credit Card Sales',
-            "Credit Card Fee ($ccFee%)",
-            'Total Layaway Sales',
-            'Total Sales',
-            "BBB Fee ($fee%)"
-        ];
 
         // Checked out column
         $checked_out = array();
@@ -137,7 +131,6 @@ class ReportController extends Controller
             'bazaar' => $bazaar->name,
             'data' => $data,
             'rollup' => $rollup,
-            'rollupCols' => $rollupCols,
             'checked_out' => $checked_out,
         );
 
@@ -203,7 +196,7 @@ class ReportController extends Controller
                 if ($sheet->date_of_sales->isSameDay($date)) {
                     $status = $sheet->getValidationStatus();
                     if($status != Validated::CORRECT)
-                        $row['valid'] = 'no';
+                        $row['status'] = 'no';
                     $row['sheets'][$sheet->sheet_number] = [
                         SalesType::CASH => $sheet->cash(),
                         SalesType::CARD => $sheet->credit(),
@@ -211,10 +204,17 @@ class ReportController extends Controller
                         'total' => $sheet->totalSales(),
                         'status' => $status
                     ];
-                    foreach ($sheet->sales as $sale) {
-                        $row[$sale->sales_type] += $sale->amount;
-                        $row['total'] += $sale->amount;
-                    }
+
+                    $row[SalesType::CASH] = $sheet->cash();
+                    $row[SalesType::CARD] = $sheet->credit();
+                    $row[SalesType::LAYAWAY] = $sheet->layaway();
+                    $row['total'] =
+                        $row[SalesType::CASH] +
+                        $row[SalesType::CARD] +
+                        $row[SalesType::LAYAWAY];
+                    $row[SalesType::CASH] = $row[SalesType::CASH];
+                    $row[SalesType::CARD] = $row[SalesType::CARD];
+                    $row[SalesType::LAYAWAY] = $row[SalesType::LAYAWAY];
                 }
             }
 
@@ -262,7 +262,7 @@ class ReportController extends Controller
 
             $id = $vendor->vendorNumber($bazaar);
             $row['id'] = $id;
-            $row['Vendor Number'] = $id . " - " . $vendor->name;
+            $row['Vendor Number'] = $id;
             $row[SalesType::CASH] = 0;
             $row[SalesType::CARD] = 0;
             $row[SalesType::LAYAWAY] = 0;
@@ -273,28 +273,13 @@ class ReportController extends Controller
                 $totals['Valid'] = 'no';
             }
 
-            foreach ($vendor->salesSheets as $sheet) {
+            $row[SalesType::CASH] = $vendor->totalCashSales($bazaar->id, $date);
+            $row[SalesType::CARD] = $vendor->totalCardSales($bazaar->id, $date);
+            $row[SalesType::LAYAWAY] = $vendor->totalLayawaySales($bazaar->id, $date);
 
-                if ($sheet->date_of_sales->isSameDay($date)) {
-
-                    foreach ($sheet->sales as $sale) {
-                        switch ($sale->sales_type) {
-                            case SalesType::CASH:
-                                $row[SalesType::CASH] += $sale->amount;
-                                $totals[SalesType::CASH] += $sale->amount;
-                                break;
-                            case SalesType::CARD:
-                                $row[SalesType::CARD] += $sale->amount;
-                                $totals[SalesType::CARD] += $sale->amount;
-                                break;
-                            case SalesType::LAYAWAY:
-                                $row[SalesType::LAYAWAY] += $sale->amount;
-                                $totals[SalesType::LAYAWAY] += $sale->amount;
-                                break;
-                        }
-                    }
-                }
-            }
+            $totals[SalesType::CASH] += $row[SalesType::CASH];
+            $totals[SalesType::CARD] += $row[SalesType::CARD];
+            $totals[SalesType::LAYAWAY] += $row[SalesType::LAYAWAY];
 
             // Calculate our "totals" column, based on format
             if ($view) {
@@ -303,6 +288,13 @@ class ReportController extends Controller
                     $row[SalesType::CARD] +
                     $row[SalesType::LAYAWAY];
                 $totals['Total'] += $row['Total'];
+
+                // Format
+                $row[SalesType::CASH] = $row[SalesType::CASH];
+                $row[SalesType::CARD] = $row[SalesType::CARD];
+                $row[SalesType::LAYAWAY] = $row[SalesType::LAYAWAY];
+                $row['Total'] = $row['Total'];
+
             } else {
                 $j = $i + 2;
                 $row['Total'] = "=SUM(\$B$j:\$D$j)";
@@ -342,31 +334,13 @@ class ReportController extends Controller
         );
 
         foreach ($bazaar->vendorsByCheckout as $i => $vendor) {
-            $totals = array(
-                SalesType::CASH => 0,
-                SalesType::CARD => 0,
-                SalesType::LAYAWAY => 0
-            );
 
-            foreach ($vendor->salesSheets as $sheet) {
+            $totals = array();
 
-                if ($sheet->bazaar_id == $bazaar->id) {
+            $totals[SalesType::CASH] = $vendor->totalCashSales($bazaar->id);
+            $totals[SalesType::CARD] = $vendor->totalCardSales($bazaar->id);
+            $totals[SalesType::LAYAWAY] = $vendor->totalLayawaySales($bazaar->id);
 
-                    foreach ($sheet->sales as $sale) {
-                        switch ($sale->sales_type) {
-                            case SalesType::CASH:
-                                $totals[SalesType::CASH] += $sale->amount;
-                                break;
-                            case SalesType::CARD:
-                                $totals[SalesType::CARD] += $sale->amount;
-                                break;
-                            case SalesType::LAYAWAY:
-                                $totals[SalesType::LAYAWAY] += $sale->amount;
-                                break;
-                        }
-                    }
-                }
-            }
 
             if ($view) {
                 // Calculate totals, fees
@@ -512,7 +486,7 @@ class ReportController extends Controller
                     ++$m;
                     $cash .= "'By Sales Sheet'!C$l,";
                     $credit .= "'By Sales Sheet'!D$l,";
-                    $layaway += "'By Sales Sheet'!E$l,";
+                    $layaway .= "'By Sales Sheet'!E$l,";
 
                     $data['days'][$date->format('l') . " Summary"][] = [
                         'Sheet Number' => "='By Sales Sheet'!B$l",

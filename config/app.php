@@ -204,7 +204,8 @@ return [
 
 		// Static classes
 		'Validated' => '\App\Validated',
-		'SalesType' => '\App\SalesType'
+		'SalesType' => '\App\SalesType',
+        'Money' => '\App\Money'
 	],
 
 ];

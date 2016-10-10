@@ -203,6 +203,9 @@ td.error {
   background-color: #e8be77;
   color: #855f1e; }
 
+table.numeric th, table.numeric td {
+  text-align: right; }
+
 .fixed-header {
   position: fixed;
   top: 0; }

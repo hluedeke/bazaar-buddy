@@ -21,7 +21,7 @@
         </ul>
         <div id="tab1" class="tab-box">
             @include('errors._warning')
-            <table border="0">
+            <table border="0" class="numeric">
                 <thead>
                 <tr>
                     <th>Date</th>
@@ -39,10 +39,10 @@
                         <td>{{$sheet->date_of_sales->format('m/d/Y')}}</td>
                         <td><a href="{{action('ChairController@review', ['id' => $sheet->sheet_number])}}">
                             {{$sheet->sheet_number}}</a></td>
-                        <td class="dollar-amount">{{$sheet->cash()}}</td>
-                        <td class="dollar-amount">{{$sheet->credit()}}</td>
-                        <td class="dollar-amount">{{$sheet->layaway()}}</td>
-                        <td class="dollar-amount">{{$sheet->totalSales()}}</td>
+                        <td>{{Money::format(($sheet->cash()))}}</td>
+                        <td>{{Money::format(($sheet->credit()))}}</td>
+                        <td>{{Money::format(($sheet->layaway()))}}</td>
+                        <td>{{Money::format(($sheet->totalSales()))}}</td>
                         @if(($status = $sheet->getValidationStatus()) == Validated::CORRECT)
                             <td>{{ $status }}</td>
                         @else
@@ -61,11 +61,15 @@
                     <tr>
                         <td></td>
                         <td></td>
-                        <td class="dollar-amount">{{$vendor->cash()}}</td>
-                        <td class="dollar-amount">{{$vendor->credit()}}</td>
-                        <td class="dollar-amount">{{$vendor->layaway()}}</td>
-                        <td class="dollar-amount">{{$vendor->totalSales()}}</td>
-                        <td></td>
+                        <td>{{Money::format(($cash = $vendor->cash()))}}</td>
+                        <td>{{Money::format(($credit = $vendor->credit()))}}</td>
+                        <td>{{Money::format(($layaway = $vendor->layaway()))}}</td>
+                        <td>{{Money::format(($totalSales = $vendor->totalSales()))}}</td>
+                        @if(($valid = $vendor->isValidated()))
+                            <td>yes</td>
+                        @else
+                            <td class="error">no</td>
+                        @endif
                     </tr>
                 @endif
                 </tbody>
@@ -73,7 +77,7 @@
         </div>
         <div id="tab2" class="tab-box">
             @include('errors._warning')
-            <table border="0">
+            <table border="0" class="numeric">
                 <thead>
                 <tr>
                     <th>Date</th>
@@ -87,10 +91,10 @@
                 @forelse($dates as $date => $data)
                     <tr>
                         <td>{{$date}}</td>
-                        <td class="dollar-amount">{{$data[SalesType::CASH]}}</td>
-                        <td class="dollar-amount">{{$data[SalesType::CARD]}}</td>
-                        <td class="dollar-amount">{{$data[SalesType::LAYAWAY]}}</td>
-                        <td class="dollar-amount">{{$data['total']}}</td>
+                        <td>{{Money::format($data[SalesType::CASH])}}</td>
+                        <td>{{Money::format($data[SalesType::CARD])}}</td>
+                        <td>{{Money::format($data[SalesType::LAYAWAY])}}</td>
+                        <td>{{Money::format($data['total'])}}</td>
                     </tr>
                 @empty
                     <tr>
@@ -103,10 +107,10 @@
                     </tr>
                     <tr>
                         <td></td>
-                        <td class="dollar-amount">{{$vendor->cash()}}</td>
-                        <td class="dollar-amount">{{$vendor->credit()}}</td>
-                        <td class="dollar-amount">{{$vendor->layaway()}}</td>
-                        <td class="dollar-amount">{{$vendor->totalSales()}}</td>
+                        <td>{{Money::format($cash)}}</td>
+                        <td>{{Money::format($credit)}}</td>
+                        <td>{{Money::format($layaway)}}</td>
+                        <td>{{Money::format($totalSales)}}</td>
                     </tr>
                 @endif
                 </tbody>
@@ -115,7 +119,7 @@
         @foreach($dates as $date => $data)
             <div id="{{$data['id']}}" class="tab-box">
                 @include('errors._warning')
-                <table border="0">
+                <table border="0" class="numeric">
                     <thead>
                     <tr>
                         <th>Sheet Number</th>
@@ -134,10 +138,10 @@
                                 {{$number}}
                                 </a>
                             </td>
-                            <td class="dollar-amount">{{$sheet[SalesType::CASH]}}</td>
-                            <td class="dollar-amount">{{$sheet[SalesType::CARD]}}</td>
-                            <td class="dollar-amount">{{$sheet[SalesType::LAYAWAY]}}</td>
-                            <td class="dollar-amount">{{$sheet['total']}}</td>
+                            <td>{{Money::format($sheet[SalesType::CASH])}}</td>
+                            <td>{{Money::format($sheet[SalesType::CARD])}}</td>
+                            <td>{{Money::format($sheet[SalesType::LAYAWAY])}}</td>
+                            <td>{{Money::format($sheet['total'])}}</td>
                             @if($sheet['status'] == Validated::CORRECT)
                                 <td>{{ $sheet['status'] }}</td>
                             @else
@@ -155,11 +159,15 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td class="dollar-amount">{{$data[SalesType::CASH]}}</td>
-                            <td class="dollar-amount">{{$data[SalesType::CARD]}}</td>
-                            <td class="dollar-amount">{{$data[SalesType::LAYAWAY]}}</td>
-                            <td class="dollar-amount">{{$data['total']}}</td>
-                            <td>{{$data['status']}}</td>
+                            <td>{{Money::format($data[SalesType::CASH])}}</td>
+                            <td>{{Money::format($data[SalesType::CARD])}}</td>
+                            <td>{{Money::format($data[SalesType::LAYAWAY])}}</td>
+                            <td>{{Money::format($data['total'])}}</td>
+                            @if($data['status'] == 'yes')
+                                <td>{{$data['status']}}</td>
+                            @else
+                                <td class="error">{{$data['status']}}</td>
+                            @endif
                         </tr>
                     @endif
                     </tbody>

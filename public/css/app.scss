@@ -57,6 +57,10 @@ td.error {
   color: #855f1e;
 }
 
+table.numeric th, table.numeric td {
+  text-align: right;
+}
+
 .fixed-header {
   position: fixed;
   top: 0;
