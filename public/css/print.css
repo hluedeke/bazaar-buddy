@@ -1,8 +1,11 @@
 /* Provides styling for vendor invoices (print) */
+@page {
+  margin: 0.25in; }
 .invoice {
   border: solid 1px #000000;
   width: 8in;
-  height: 10.5in; }
+  height: 10.5in;
+  page-break-after: always; }
   .invoice h1 {
     font-size: 16pt;
     font-weight: bold;
@@ -28,7 +31,8 @@
     font-size: 12pt;
     margin: 0 auto 0.45in auto; }
     .invoice table thead {
-      height: 0.62in; }
+      height: 0.5in;
+      display: table-row-group; }
       .invoice table thead th {
         border: 1px solid black;
         font-weight: bold;
