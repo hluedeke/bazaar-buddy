@@ -72,7 +72,7 @@
             </table>
 
             @if(isset($tab['date']))
-                <a href="{{action('ReportController@daily')}}?date={{$tab['date']}}">
+                <a href="{{action('ReportController@daily')}}?date={{$tab['date']}}" target="print">
                     <button style=" margin-top: 4px; float: right">Print Daily</button>
                 </a>
                 <div style="clear: both"></div>
