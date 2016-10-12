@@ -1,10 +1,15 @@
 /* Provides styling for vendor invoices (print) */
 $font_stack: Verdana, Arial, sans-serif;
 
+@page {
+  margin: 0.25in;
+}
+
 .invoice {
   border: solid 1px #000000;
   width: 8in;
   height: 10.5in;
+  page-break-after:always;
 
   h1 {
     font-size: 16pt;
@@ -36,7 +41,8 @@ $font_stack: Verdana, Arial, sans-serif;
     margin: 0 auto 0.45in auto;
 
     thead {
-      height: 0.62in;
+      height: 0.5in;
+      display: table-row-group;
 
       th {
         border: 1px solid black;
